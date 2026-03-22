@@ -4,20 +4,27 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ProgressBar from './ProgressBar';
 import ServerSearch from './ServerSearch';
-import { EvaluationInput, ServerInfo, WeaponData, Evaluation } from '@/lib/types';
+import {
+  EvaluationInput,
+  ServerInfo,
+  WeaponData,
+  Evaluation,
+  SquadType,
+  SQUAD_HEROES,
+} from '@/lib/types';
 import { calculateValuation } from '@/lib/valuation';
 import { saveEvaluation, getLatestEvaluation } from '@/lib/storage';
 
 const STEP_LABELS = ['Server', 'Big Three', 'Combat', 'Collection', 'Resources'];
 
-const DRONE_COMPONENT_OPTIONS = [
-  'Mostly Rare',
-  'Mostly Epic',
-  'Mix of Legendary & Epic',
-  'Max Legendary',
+const OIL_TECH_OPTIONS = [
+  'Not Unlocked',
+  'Less than 20%',
+  '20% - 50%',
+  '50% - 80%',
+  'Above 80%',
+  'Maxed (100%)',
 ];
-
-const OIL_TECH_OPTIONS = ['Not Unlocked', 'Early', 'Mid', 'Advanced', 'Maxed'];
 
 const RSS_OPTIONS = ['Under 100M', '100M-500M', '500M-1B', '1B-5B', '5B+'];
 
@@ -50,12 +57,20 @@ export default function EvaluationWizard() {
   const [decorationPower, setDecorationPower] = useState('');
   const [totalHeroPower, setTotalHeroPower] = useState('');
   const [heroPowerRank, setHeroPowerRank] = useState('');
-  const [mainSquadPower, setMainSquadPower] = useState('');
+
+  // CHANGE 1: Squad type + heroes
+  const [squadType, setSquadType] = useState<SquadType | ''>('');
+  const [heroePowers, setHeroPowers] = useState<Record<string, string>>({});
+
   const [weapons, setWeapons] = useState<WeaponData[]>(
     Array.from({ length: 5 }, () => ({ unlocked: false, level: 1 }))
   );
   const [droneLevel, setDroneLevel] = useState('');
-  const [droneComponents, setDroneComponents] = useState('Mostly Rare');
+
+  // CHANGE 3: Drone component level + power
+  const [droneComponentLevel, setDroneComponentLevel] = useState('1');
+  const [droneComponentPower, setDroneComponentPower] = useState('');
+
   const [skinsCount, setSkinsCount] = useState('');
   const [overlordLevel, setOverlordLevel] = useState('');
   const [hqLevel, setHqLevel] = useState('15');
@@ -65,7 +80,7 @@ export default function EvaluationWizard() {
   const [diamonds, setDiamonds] = useState('');
   const [totalMoneySpent, setTotalMoneySpent] = useState('F2P ($0)');
 
-  // Pre-fill from last evaluation
+  // Pre-fill from last evaluation (with backward compatibility)
   useEffect(() => {
     const last = getLatestEvaluation();
     if (last) {
@@ -74,10 +89,30 @@ export default function EvaluationWizard() {
       setDecorationPower(formatNum(inp.decorationPower));
       setTotalHeroPower(formatNum(inp.totalHeroPower));
       setHeroPowerRank(inp.heroPowerRank.toString());
-      setMainSquadPower(formatNum(inp.mainSquadPower));
+
+      // New squad fields — gracefully handle old data
+      if (inp.squadType) {
+        setSquadType(inp.squadType);
+      }
+      if (inp.squadHeroes && Object.keys(inp.squadHeroes).length > 0) {
+        const formatted: Record<string, string> = {};
+        for (const [name, power] of Object.entries(inp.squadHeroes)) {
+          formatted[name] = formatNum(power);
+        }
+        setHeroPowers(formatted);
+      }
+
       setWeapons(inp.exclusiveWeapons);
       setDroneLevel(inp.droneLevel.toString());
-      setDroneComponents(inp.droneComponents);
+
+      // New drone component fields — gracefully handle old data
+      if (inp.droneComponentLevel !== undefined && inp.droneComponentLevel > 0) {
+        setDroneComponentLevel(inp.droneComponentLevel.toString());
+      }
+      if (inp.droneComponentPower !== undefined && inp.droneComponentPower > 0) {
+        setDroneComponentPower(formatNum(inp.droneComponentPower));
+      }
+
       setSkinsCount(inp.skinsCount.toString());
       setOverlordLevel(inp.overlordLevel.toString());
       setHqLevel(inp.hqLevel.toString());
@@ -104,8 +139,29 @@ export default function EvaluationWizard() {
     });
   }
 
+  function updateHeroPower(heroName: string, value: string) {
+    const raw = value.replace(/,/g, '');
+    if (raw === '' || /^\d+$/.test(raw)) {
+      setHeroPowers((prev) => ({
+        ...prev,
+        [heroName]: raw ? parseInt(raw, 10).toLocaleString('en-US') : '',
+      }));
+    }
+  }
+
   function handleSubmit() {
     if (!serverInfo) return;
+
+    // Build squad heroes record
+    const squadHeroesRecord: Record<string, number> = {};
+    if (squadType) {
+      const heroes = SQUAD_HEROES[squadType];
+      heroes.forEach((name) => {
+        squadHeroesRecord[name] = parseNum(heroePowers[name] || '0');
+      });
+    }
+
+    const totalSquadPower = Object.values(squadHeroesRecord).reduce((s, p) => s + p, 0);
 
     const input: EvaluationInput = {
       serverId: serverInfo.id,
@@ -114,10 +170,13 @@ export default function EvaluationWizard() {
       decorationPower: parseNum(decorationPower),
       totalHeroPower: parseNum(totalHeroPower),
       heroPowerRank: parseNum(heroPowerRank),
-      mainSquadPower: parseNum(mainSquadPower),
+      squadType,
+      squadHeroes: squadHeroesRecord,
+      mainSquadPower: totalSquadPower,
       exclusiveWeapons: weapons,
       droneLevel: parseInt(droneLevel, 10) || 0,
-      droneComponents,
+      droneComponentLevel: parseInt(droneComponentLevel, 10) || 1,
+      droneComponentPower: parseNum(droneComponentPower),
       skinsCount: parseInt(skinsCount, 10) || 0,
       overlordLevel: parseInt(overlordLevel, 10) || 0,
       hqLevel: parseInt(hqLevel, 10) || 15,
@@ -162,6 +221,9 @@ export default function EvaluationWizard() {
   const selectClass =
     'w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500';
   const labelClass = 'block text-sm font-medium text-gray-300 mb-1';
+
+  // Get current squad heroes list
+  const currentHeroes = squadType ? SQUAD_HEROES[squadType] : [];
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -231,19 +293,53 @@ export default function EvaluationWizard() {
           <h2 className="text-2xl font-bold text-white mb-4">
             Step 3 of 5: Combat & Weapons
           </h2>
+
+          {/* CHANGE 1: Squad Type + Heroes */}
           <div>
-            <label className={labelClass}>Main Squad Power</label>
-            <input
-              type="text"
-              value={mainSquadPower}
-              onChange={(e) =>
-                handleNumericInput(e.target.value, setMainSquadPower)
-              }
-              placeholder="e.g. 35,000,000"
-              className={inputClass}
-            />
+            <label className={labelClass}>Main Squad Type</label>
+            <select
+              value={squadType}
+              onChange={(e) => setSquadType(e.target.value as SquadType | '')}
+              className={selectClass}
+            >
+              <option value="">Select squad type...</option>
+              <option value="Air">Air</option>
+              <option value="Tank">Tank</option>
+              <option value="Missile">Missile</option>
+            </select>
           </div>
 
+          {squadType && (
+            <div className="space-y-2">
+              <label className={labelClass}>Squad Hero Powers</label>
+              {currentHeroes.map((heroName) => (
+                <div
+                  key={heroName}
+                  className="flex items-center gap-3 p-2 bg-gray-800/50 rounded-lg"
+                >
+                  <span className="text-sm text-gray-300 w-24 shrink-0">
+                    {heroName}
+                  </span>
+                  <input
+                    type="text"
+                    value={heroePowers[heroName] || ''}
+                    onChange={(e) => updateHeroPower(heroName, e.target.value)}
+                    placeholder="e.g. 2,450,000"
+                    className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 text-sm"
+                  />
+                </div>
+              ))}
+              <p className="text-xs text-gray-500 mt-1">
+                Total:{' '}
+                {currentHeroes
+                  .reduce((sum, name) => sum + parseNum(heroePowers[name] || '0'), 0)
+                  .toLocaleString('en-US')}{' '}
+                power
+              </p>
+            </div>
+          )}
+
+          {/* CHANGE 2: Exclusive Weapons — level 1-30 */}
           <div>
             <label className={labelClass}>Exclusive Weapons</label>
             <div className="space-y-2 mt-2">
@@ -273,7 +369,7 @@ export default function EvaluationWizard() {
                       }
                       className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm"
                     >
-                      {Array.from({ length: 10 }, (_, j) => j + 1).map((l) => (
+                      {Array.from({ length: 30 }, (_, j) => j + 1).map((l) => (
                         <option key={l} value={l}>
                           Level {l}
                         </option>
@@ -298,19 +394,33 @@ export default function EvaluationWizard() {
             />
           </div>
 
+          {/* CHANGE 3: Drone Component Level + Power */}
           <div>
-            <label className={labelClass}>Drone Components</label>
+            <label className={labelClass}>Drone Component Level</label>
             <select
-              value={droneComponents}
-              onChange={(e) => setDroneComponents(e.target.value)}
+              value={droneComponentLevel}
+              onChange={(e) => setDroneComponentLevel(e.target.value)}
               className={selectClass}
             >
-              {DRONE_COMPONENT_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((l) => (
+                <option key={l} value={l}>
+                  {l}
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className={labelClass}>Overall Drone Component Power</label>
+            <input
+              type="text"
+              value={droneComponentPower}
+              onChange={(e) =>
+                handleNumericInput(e.target.value, setDroneComponentPower)
+              }
+              placeholder="e.g. 450,000"
+              className={inputClass}
+            />
           </div>
         </div>
       )}
@@ -362,6 +472,7 @@ export default function EvaluationWizard() {
                   ))}
                 </select>
               </div>
+              {/* CHANGE 4: Oil Tech with new percentage options */}
               <div>
                 <label className={labelClass}>Oil Tech Tree</label>
                 <select

@@ -116,7 +116,7 @@ export default function ResultsDashboard() {
       <ValueChart evaluations={allEvals} />
 
       {/* Section 3: Value Breakdown */}
-      <ValueBreakdown categories={result.categories} />
+      <ValueBreakdown categories={result.categories} input={latest.input} />
 
       {/* Section 4: What Changed */}
       {changedCategories.length > 0 && (

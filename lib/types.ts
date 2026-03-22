@@ -19,6 +19,19 @@ export interface WeaponData {
   level: number;
 }
 
+export type SquadType = 'Air' | 'Tank' | 'Missile';
+
+export interface SquadHeroData {
+  name: string;
+  power: number;
+}
+
+export const SQUAD_HEROES: Record<SquadType, string[]> = {
+  Air: ['DVA', 'Morrison', 'Carlie', 'Lucius', 'Schuyler'],
+  Tank: ['Kimberly', 'Stetman', 'Williams', 'Murphy', 'Marshall'],
+  Missile: ['Adam', 'Fiona', 'Tesla', 'Swift', 'McGregor'],
+};
+
 export interface EvaluationInput {
   // Step 1
   serverId: number;
@@ -31,22 +44,28 @@ export interface EvaluationInput {
   heroPowerRank: number;
 
   // Step 3
-  mainSquadPower: number;
-  exclusiveWeapons: WeaponData[];
+  squadType: SquadType | '';
+  squadHeroes: Record<string, number>; // heroName -> power
+  mainSquadPower: number; // total squad power (sum of hero powers or manual entry)
+  exclusiveWeapons: WeaponData[]; // level now 1-30
   droneLevel: number;
-  droneComponents: string;
+  droneComponentLevel: number; // 1-10
+  droneComponentPower: number; // overall component power
 
   // Step 4
   skinsCount: number;
   overlordLevel: number;
   hqLevel: number;
-  oilTechTree: string;
+  oilTechTree: string; // new options: "Not Unlocked" | "Less than 20%" | "20% - 50%" | "50% - 80%" | "Above 80%" | "Maxed (100%)"
 
   // Step 5
   vipLevel: number;
   rssReserves: string;
   diamonds: number;
   totalMoneySpent: string;
+
+  // Legacy field kept for backward compatibility when reading old evals
+  droneComponents?: string;
 }
 
 export interface CategoryResult {
@@ -60,6 +79,7 @@ export interface CategoryResult {
   weightedScore: number;
   dollarValue: number;
   label: string;
+  detail?: string; // extra display info for the results breakdown
 }
 
 export interface ValuationResult {

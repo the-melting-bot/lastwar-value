@@ -47,6 +47,14 @@ const SKINS_COUNT_ANCHORS: Anchor[] = [
   { day: 900, value: 18 },
 ];
 
+const DRONE_COMPONENT_POWER_ANCHORS: Anchor[] = [
+  { day: 100, value: 50000 },
+  { day: 300, value: 150000 },
+  { day: 500, value: 350000 },
+  { day: 700, value: 600000 },
+  { day: 900, value: 900000 },
+];
+
 function interpolate(anchors: Anchor[], day: number): number {
   const clampedDay = Math.max(100, Math.min(900, day));
 
@@ -77,21 +85,25 @@ function scoreHeroPowerRank(rank: number): number {
   return 0.4;
 }
 
-function scoreDroneComponents(component: string): number {
-  switch (component) {
-    case 'Max Legendary':
-      return 2.0;
-    case 'Mix of Legendary & Epic':
-      return 1.4;
-    case 'Mostly Epic':
-      return 1.0;
-    case 'Mostly Rare':
-      return 0.5;
-    default:
-      return 0.5;
-  }
+// CHANGE 3: New drone component scoring
+function scoreDroneComponentLevel(level: number): number {
+  if (level >= 10) return 2.0;
+  if (level >= 8) return 1.6;
+  if (level >= 6) return 1.2;
+  if (level >= 4) return 0.9;
+  if (level >= 2) return 0.6;
+  return 0.3;
 }
 
+function scoreDroneComponents(input: EvaluationInput, day: number): number {
+  // New formula: average of level score and power-relative-to-baseline
+  const levelScore = scoreDroneComponentLevel(input.droneComponentLevel || 1);
+  const baseline = interpolate(DRONE_COMPONENT_POWER_ANCHORS, day);
+  const powerScore = (input.droneComponentPower || 0) / baseline;
+  return (levelScore + powerScore) / 2;
+}
+
+// CHANGE 2: Updated weapon scoring — denominator changed from 10 to 30
 function scoreExclusiveWeapons(
   weapons: { unlocked: boolean; level: number }[]
 ): number {
@@ -99,7 +111,36 @@ function scoreExclusiveWeapons(
   if (unlocked.length === 0) return 0.1;
   const avgLevel =
     unlocked.reduce((sum, w) => sum + w.level, 0) / unlocked.length;
-  return (unlocked.length / 5) * (avgLevel / 10) * 2.5;
+  return (unlocked.length / 5) * (avgLevel / 30) * 2.5;
+}
+
+// CHANGE 1: Updated main squad scoring with balance bonus
+function scoreMainSquad(input: EvaluationInput, day: number): { score: number; playerValue: number | string; baseline: number | string } {
+  const squadBaseline = interpolate(MAIN_SQUAD_POWER_ANCHORS, day);
+
+  // Get total squad power — either from hero sum or the manual entry
+  const heroPowers = Object.values(input.squadHeroes || {}).filter((p) => p > 0);
+  const totalFromHeroes = heroPowers.reduce((sum, p) => sum + p, 0);
+  const totalPower = totalFromHeroes > 0 ? totalFromHeroes : (input.mainSquadPower || 0);
+
+  let score = totalPower / squadBaseline;
+
+  // Squad balance bonus: if we have individual hero powers, check balance
+  if (heroPowers.length >= 2) {
+    const maxPower = Math.max(...heroPowers);
+    const minPower = Math.min(...heroPowers);
+    if (maxPower > 0 && minPower >= maxPower * 0.7) {
+      score *= 1.1; // 10% bonus for balanced squad
+    }
+  }
+
+  const squadTypeLabel = input.squadType ? ` (${input.squadType})` : '';
+
+  return {
+    score,
+    playerValue: `${totalPower.toLocaleString('en-US')}${squadTypeLabel}`,
+    baseline: Math.round(squadBaseline),
+  };
 }
 
 function scoreOverlordLevel(level: number, season: number): number {
@@ -120,9 +161,23 @@ function scoreHqLevel(level: number, season: number): number {
   return 0.4;
 }
 
+// CHANGE 4: Updated oil tech scoring with new percentage tiers
 function scoreOilTechTree(tree: string, season: number): number {
   if (season < 2) return 0;
   switch (tree) {
+    case 'Maxed (100%)':
+      return 2.0;
+    case 'Above 80%':
+      return 1.7;
+    case '50% - 80%':
+      return 1.3;
+    case '20% - 50%':
+      return 0.9;
+    case 'Less than 20%':
+      return 0.5;
+    case 'Not Unlocked':
+      return 0.2;
+    // Legacy support for old data
     case 'Maxed':
       return 2.0;
     case 'Advanced':
@@ -131,8 +186,6 @@ function scoreOilTechTree(tree: string, season: number): number {
       return 1.0;
     case 'Early':
       return 0.6;
-    case 'Not Unlocked':
-      return 0.2;
     default:
       return 0.2;
   }
@@ -258,7 +311,7 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
   const season = input.serverSeason;
   const weights = season >= 2 ? POST_SEASON2_WEIGHTS : PRE_SEASON2_WEIGHTS;
 
-  const scores: Record<string, { score: number; playerValue: number | string; baseline: number | string }> = {};
+  const scores: Record<string, { score: number; playerValue: number | string; baseline: number | string; detail?: string }> = {};
 
   // Interpolated categories
   const decBaseline = interpolate(DECORATION_POWER_ANCHORS, day);
@@ -275,12 +328,9 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
     baseline: Math.round(heroBaseline),
   };
 
-  const squadBaseline = interpolate(MAIN_SQUAD_POWER_ANCHORS, day);
-  scores.mainSquadPower = {
-    score: input.mainSquadPower / squadBaseline,
-    playerValue: input.mainSquadPower,
-    baseline: Math.round(squadBaseline),
-  };
+  // CHANGE 1: Main squad with balance bonus
+  const squadResult = scoreMainSquad(input, day);
+  scores.mainSquadPower = squadResult;
 
   const droneBaseline = interpolate(DRONE_LEVEL_ANCHORS, day);
   scores.droneLevel = {
@@ -303,16 +353,25 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
     baseline: 'Top 100',
   };
 
+  // CHANGE 3: Drone components with level + power
+  const droneCompScore = scoreDroneComponents(input, day);
+  const compBaseline = interpolate(DRONE_COMPONENT_POWER_ANCHORS, day);
   scores.droneComponents = {
-    score: scoreDroneComponents(input.droneComponents),
-    playerValue: input.droneComponents,
-    baseline: 'Mostly Epic',
+    score: droneCompScore,
+    playerValue: `Level ${input.droneComponentLevel || 1} — ${(input.droneComponentPower || 0).toLocaleString('en-US')} power`,
+    baseline: `Level 6 — ${Math.round(compBaseline).toLocaleString('en-US')} power`,
   };
 
+  // CHANGE 2: Exclusive weapons with level 1-30
+  const weaponScore = scoreExclusiveWeapons(input.exclusiveWeapons);
+  const unlockedWeapons = input.exclusiveWeapons.filter((w) => w.unlocked);
+  const avgWeaponLevel = unlockedWeapons.length > 0
+    ? Math.round(unlockedWeapons.reduce((sum, w) => sum + w.level, 0) / unlockedWeapons.length)
+    : 0;
   scores.exclusiveWeapons = {
-    score: scoreExclusiveWeapons(input.exclusiveWeapons),
-    playerValue: `${input.exclusiveWeapons.filter((w) => w.unlocked).length}/5 unlocked`,
-    baseline: '3/5 unlocked',
+    score: weaponScore,
+    playerValue: `${unlockedWeapons.length}/5 Unlocked — Avg Level: ${avgWeaponLevel}`,
+    baseline: '3/5 Unlocked — Avg Level: 15',
   };
 
   scores.overlordLevel = {
@@ -327,10 +386,11 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
     baseline: season >= 2 ? '20' : 'N/A',
   };
 
+  // CHANGE 4: Oil tech with new percentage tiers
   scores.oilTechTree = {
     score: scoreOilTechTree(input.oilTechTree, season),
     playerValue: season >= 2 ? input.oilTechTree : 'N/A',
-    baseline: season >= 2 ? 'Mid' : 'N/A',
+    baseline: season >= 2 ? '50% - 80%' : 'N/A',
   };
 
   scores.vipLevel = {
@@ -370,6 +430,7 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
       weightedScore,
       dollarValue: weight > 0 ? scoreToDollar(s.score) * weight : 0,
       label: weight > 0 ? getLabel(s.score) : 'N/A',
+      detail: s.detail,
     };
   });
 
@@ -402,14 +463,14 @@ export function getRecommendations(
     decorationPower: 'Focus on decoration events and daily decoration quests',
     totalHeroPower: 'Invest in hero shards and hero experience items',
     heroPowerRank: 'Push hero power to climb server rankings',
-    mainSquadPower: 'Level up main squad troops and research combat tech',
-    exclusiveWeapons: 'Unlock and upgrade exclusive weapons in events',
+    mainSquadPower: 'Balance your squad heroes and upgrade combat tech',
+    exclusiveWeapons: 'Unlock and upgrade exclusive weapons (push toward level 30)',
     droneLevel: 'Farm drone EXP and upgrade drone consistently',
-    droneComponents: 'Focus on getting Epic and Legendary drone parts',
+    droneComponents: 'Upgrade drone component levels and power',
     skinsCount: 'Collect skins from events and seasonal content',
     overlordLevel: 'Complete Overlord quests and challenges',
     hqLevel: 'Upgrade HQ by meeting building requirements',
-    oilTechTree: 'Invest in oil tech research',
+    oilTechTree: 'Invest in oil tech research to increase completion %',
     vipLevel: 'Increase VIP through daily play and spending',
     rssReserves: 'Stockpile RSS from gathering and events',
     diamonds: 'Save diamonds and farm from events',
