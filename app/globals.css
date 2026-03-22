@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #111827;
+  --color-foreground: #ffffff;
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: #111827;
+  color: #ffffff;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Animated grid background */
+@keyframes gridMove {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(40px);
+  }
+}
+
+.animated-grid {
+  background-image:
+    linear-gradient(rgba(249, 115, 22, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(249, 115, 22, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridMove 3s linear infinite;
+}
+
+/* Radar sweep effect */
+@keyframes radarSweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.radar-sweep::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  transform-origin: 0 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(249, 115, 22, 0.08) 30deg,
+    transparent 60deg
+  );
+  animation: radarSweep 6s linear infinite;
+  pointer-events: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
