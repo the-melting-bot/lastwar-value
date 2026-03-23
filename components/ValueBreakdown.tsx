@@ -21,24 +21,24 @@ function getLabelColor(label: string): string {
     case 'EXCEPTIONAL':
       return 'text-orange-400';
     default:
-      return 'text-gray-500';
+      return 'text-slate-500';
   }
 }
 
-function getBarColor(label: string): string {
+function getBarGradient(label: string): string {
   switch (label) {
     case 'LOW':
-      return 'bg-red-500';
+      return 'linear-gradient(90deg, #ef4444, #f87171)';
     case 'AVERAGE':
-      return 'bg-yellow-500';
+      return 'linear-gradient(90deg, #eab308, #facc15)';
     case 'ABOVE AVG':
-      return 'bg-green-500';
+      return 'linear-gradient(90deg, #22c55e, #4ade80)';
     case 'HIGH':
-      return 'bg-emerald-500';
+      return 'linear-gradient(90deg, #10b981, #34d399)';
     case 'EXCEPTIONAL':
-      return 'bg-orange-500';
+      return 'linear-gradient(90deg, #FF6B00, #FFD700)';
     default:
-      return 'bg-gray-600';
+      return 'linear-gradient(90deg, #475569, #64748b)';
   }
 }
 
@@ -59,7 +59,7 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
     : [];
 
   return (
-    <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+    <div className="card-static p-6">
       <h3 className="text-lg font-bold text-white mb-4">Value Breakdown</h3>
       <div className="space-y-3">
         {active.map((cat) => {
@@ -70,10 +70,11 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
           return (
             <div
               key={cat.key}
-              className="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50"
+              className="p-3.5 rounded-xl"
+              style={{ background: 'rgba(15, 29, 50, 0.5)', border: '1px solid rgba(255, 107, 0, 0.08)' }}
             >
               <div
-                className={`flex items-center justify-between mb-1 ${
+                className={`flex items-center justify-between mb-1.5 ${
                   hasExpandableDetail ? 'cursor-pointer' : ''
                 }`}
                 onClick={() => {
@@ -88,7 +89,7 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                     {cat.name}
                   </span>
                   {hasExpandableDetail && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-slate-500">
                       {isExpanded ? '▾' : '▸'}
                     </span>
                   )}
@@ -97,32 +98,33 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                   <span className={`text-xs font-bold ${getLabelColor(cat.label)}`}>
                     {cat.label}
                   </span>
-                  <span className="text-sm font-bold text-orange-400">
+                  <span className="text-sm font-bold value-gradient">
                     ${cat.dollarValue.toFixed(0)}
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs text-gray-400">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs text-slate-400">
                   You: {formatValue(cat.playerValue)}
                 </span>
-                <span className="text-xs text-gray-600">|</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-slate-600">|</span>
+                <span className="text-xs text-slate-500">
                   Avg: {formatValue(cat.baseline)}
                 </span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-1.5">
+              <div className="w-full rounded-full h-1.5" style={{ background: 'rgba(15, 29, 50, 0.8)' }}>
                 <div
-                  className={`h-1.5 rounded-full transition-all ${getBarColor(cat.label)}`}
+                  className="h-1.5 rounded-full transition-all"
                   style={{
                     width: `${Math.min(Math.max(cat.score / 2.5, 0) * 100, 100)}%`,
+                    background: getBarGradient(cat.label),
                   }}
                 />
               </div>
 
               {/* Expandable hero detail for Main Squad */}
               {isExpanded && cat.key === 'mainSquadPower' && (
-                <div className="mt-2 pt-2 border-t border-gray-700/50 space-y-1">
+                <div className="mt-3 pt-3 space-y-1" style={{ borderTop: '1px solid rgba(255, 107, 0, 0.1)' }}>
                   {input?.squadType && (
                     <p className="text-xs text-orange-400 font-medium mb-1">
                       {input.squadType} Squad
@@ -133,8 +135,8 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                       key={name}
                       className="flex items-center justify-between text-xs"
                     >
-                      <span className="text-gray-400">{name}</span>
-                      <span className="text-gray-300">
+                      <span className="text-slate-400">{name}</span>
+                      <span className="text-slate-300">
                         {power.toLocaleString('en-US')}
                       </span>
                     </div>

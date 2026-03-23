@@ -31,12 +31,12 @@ export default function ResultsDashboard() {
         <h2 className="text-2xl font-bold text-white mb-4">
           No evaluations yet
         </h2>
-        <p className="text-gray-400 mb-6">
+        <p className="text-slate-400 mb-6">
           Complete an evaluation to see your results.
         </p>
         <button
           onClick={() => router.push('/evaluate')}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium"
+          className="btn-primary px-8 py-3"
         >
           Start Evaluation →
         </button>
@@ -88,17 +88,17 @@ export default function ResultsDashboard() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Section 1: Value Header */}
-      <div className="text-center p-8 bg-gray-800/50 border border-gray-700 rounded-xl backdrop-blur">
-        <p className="text-gray-400 text-sm mb-2">Your Base Value</p>
-        <p className="text-5xl font-bold text-orange-500 mb-2">
+      <div className="card-static p-8 text-center">
+        <p className="text-slate-400 text-sm mb-3 tracking-wide uppercase font-medium">Your Base Value</p>
+        <p className="text-5xl sm:text-6xl font-bold value-gradient mb-3">
           ${result.totalValue}
         </p>
-        <p className="text-gray-400 mb-3">
+        <p className="text-slate-400 mb-3 text-lg">
           ${result.lowRange} — ${result.highRange}
         </p>
         {change !== null && (
           <p
-            className={`text-lg font-medium ${
+            className={`text-lg font-semibold ${
               change >= 0 ? 'text-green-400' : 'text-red-400'
             }`}
           >
@@ -106,7 +106,7 @@ export default function ResultsDashboard() {
             {change >= 0 ? '↑' : '↓'}
           </p>
         )}
-        <p className="text-gray-500 text-sm mt-2">
+        <p className="text-slate-500 text-sm mt-3">
           Server #{serverInfo.id} — Day {serverInfo.day} — Season{' '}
           {serverInfo.season}
         </p>
@@ -120,24 +120,24 @@ export default function ResultsDashboard() {
 
       {/* Section 4: What Changed */}
       {changedCategories.length > 0 && (
-        <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+        <div className="card-static p-6">
           <h3 className="text-lg font-bold text-white mb-4">What Changed</h3>
           <div className="space-y-2">
             {changedCategories.map((c, i) => (
-              <div key={i} className="flex items-center justify-between text-sm">
-                <span className="text-gray-300">
+              <div key={i} className="flex items-center justify-between text-sm py-1">
+                <span className="text-slate-300">
                   {c.emoji} {c.name}
                 </span>
                 <span
-                  className={
+                  className={`font-medium ${
                     c.diff > 0 ? 'text-green-400' : 'text-red-400'
-                  }
+                  }`}
                 >
-                  {c.diff > 0 ? '✅ +' : '🔻 '}${Math.abs(c.diff).toFixed(0)}
+                  {c.diff > 0 ? '+' : ''}${Math.abs(c.diff).toFixed(0)}
                 </span>
               </div>
             ))}
-            <div className="border-t border-gray-700 pt-2 mt-2 flex justify-between font-bold text-sm">
+            <div className="pt-2 mt-2 flex justify-between font-bold text-sm" style={{ borderTop: '1px solid rgba(255, 107, 0, 0.1)' }}>
               <span className="text-white">Net Change</span>
               <span
                 className={
@@ -152,7 +152,7 @@ export default function ResultsDashboard() {
       )}
 
       {/* Section 5: Recommendations */}
-      <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+      <div className="card-static p-6">
         <h3 className="text-lg font-bold text-white mb-4">
           💡 Invest Next
         </h3>
@@ -160,17 +160,18 @@ export default function ResultsDashboard() {
           {recommendations.map((rec, i) => (
             <div
               key={i}
-              className="p-3 bg-gray-900/50 rounded-lg border border-gray-700/50"
+              className="p-4 rounded-xl"
+              style={{ background: 'rgba(15, 29, 50, 0.5)', border: '1px solid rgba(255, 107, 0, 0.08)' }}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-medium text-white">
                   {rec.category}
                 </span>
-                <span className="text-xs text-green-400 font-medium">
+                <span className="text-xs text-green-400 font-semibold">
                   +${rec.estimatedBoost} potential
                 </span>
               </div>
-              <p className="text-xs text-gray-400">{rec.action}</p>
+              <p className="text-xs text-slate-400">{rec.action}</p>
             </div>
           ))}
         </div>
@@ -180,18 +181,18 @@ export default function ResultsDashboard() {
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           onClick={() => router.push('/evaluate')}
-          className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors text-center"
+          className="btn-primary flex-1 px-6 py-3.5 text-center"
         >
           🔄 Re-Evaluate Now
         </button>
         <button
           onClick={handleShare}
-          className="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors text-center"
+          className="btn-secondary flex-1 px-6 py-3.5 text-center"
         >
           {copied ? '✅ Copied!' : '📤 Share Results'}
         </button>
       </div>
-      <p className="text-center text-gray-500 text-sm">
+      <p className="text-center text-slate-500 text-sm">
         Next suggested eval:{' '}
         {nextEvalDate.toLocaleDateString('en-US', {
           month: 'short',

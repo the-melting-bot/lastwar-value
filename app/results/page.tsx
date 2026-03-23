@@ -9,11 +9,11 @@ export default function ResultsPage() {
       <div className="max-w-3xl mx-auto mb-8">
         <Link
           href="/"
-          className="text-gray-400 hover:text-white text-sm transition-colors"
+          className="text-slate-500 hover:text-orange-400 text-sm transition-colors"
         >
           ← Back to Home
         </Link>
-        <h1 className="text-3xl font-bold text-white mt-4 mb-2">
+        <h1 className="text-3xl font-bold text-white mt-4 mb-1">
           Your Results
         </h1>
       </div>

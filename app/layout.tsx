@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-[#111827] text-white antialiased">
+      <body className="min-h-full flex flex-col bg-[#0a1628] text-slate-200 antialiased">
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

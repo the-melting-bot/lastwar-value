@@ -9,6 +9,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Area,
+  AreaChart,
 } from 'recharts';
 import { Evaluation } from '@/lib/types';
 
@@ -54,14 +56,14 @@ export default function ValueChart({ evaluations }: ValueChartProps) {
 
   if (evaluations.length === 1) {
     return (
-      <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+      <div className="card-static p-6">
         <h3 className="text-lg font-bold text-white mb-4">Value Over Time</h3>
-        <div className="flex items-center justify-center h-48 text-gray-400">
+        <div className="flex items-center justify-center h-48 text-slate-400">
           <div className="text-center">
-            <div className="w-4 h-4 bg-orange-500 rounded-full mx-auto mb-3" />
-            <p>First evaluation recorded!</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Re-evaluate in 2 weeks to start tracking your growth!
+            <div className="w-4 h-4 rounded-full mx-auto mb-3" style={{ background: 'linear-gradient(135deg, #FF6B00, #FFD700)' }} />
+            <p>First evaluation recorded</p>
+            <p className="text-sm text-slate-500 mt-1">
+              Re-evaluate in 2 weeks to start tracking growth
             </p>
           </div>
         </div>
@@ -70,7 +72,7 @@ export default function ValueChart({ evaluations }: ValueChartProps) {
   }
 
   return (
-    <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6">
+    <div className="card-static p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-white">Value Over Time</h3>
         <div className="flex gap-1">
@@ -78,11 +80,16 @@ export default function ValueChart({ evaluations }: ValueChartProps) {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1 text-xs rounded font-medium transition-colors ${
+              className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
                 filter === f
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-gray-700 text-gray-400 hover:text-white'
+                  ? 'text-white'
+                  : 'text-slate-400 hover:text-white'
               }`}
+              style={
+                filter === f
+                  ? { background: 'linear-gradient(135deg, #FF6B00, #FF8A33)' }
+                  : { background: 'rgba(15, 29, 50, 0.6)' }
+              }
             >
               {f}
             </button>
@@ -91,36 +98,43 @@ export default function ValueChart({ evaluations }: ValueChartProps) {
       </div>
 
       <ResponsiveContainer width="100%" height={250}>
-        <LineChart data={filteredData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+        <AreaChart data={filteredData}>
+          <defs>
+            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={lineColor} stopOpacity={0.3} />
+              <stop offset="100%" stopColor={lineColor} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 107, 0, 0.06)" />
           <XAxis
             dataKey="date"
-            stroke="#6b7280"
-            tick={{ fill: '#9ca3af', fontSize: 12 }}
+            stroke="#334155"
+            tick={{ fill: '#64748b', fontSize: 12 }}
           />
           <YAxis
-            stroke="#6b7280"
-            tick={{ fill: '#9ca3af', fontSize: 12 }}
+            stroke="#334155"
+            tick={{ fill: '#64748b', fontSize: 12 }}
             tickFormatter={(v) => `$${v}`}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1f2937',
-              border: '1px solid #374151',
-              borderRadius: '8px',
-              color: '#fff',
+              backgroundColor: '#0f1d32',
+              border: '1px solid rgba(255, 107, 0, 0.15)',
+              borderRadius: '12px',
+              color: '#e2e8f0',
             }}
             formatter={(value) => [`$${value}`, 'Value']}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="value"
             stroke={lineColor}
-            strokeWidth={2}
-            dot={{ fill: lineColor, strokeWidth: 2 }}
-            activeDot={{ r: 6 }}
+            strokeWidth={2.5}
+            fill="url(#chartGradient)"
+            dot={{ fill: lineColor, strokeWidth: 0, r: 4 }}
+            activeDot={{ r: 6, strokeWidth: 2, stroke: '#0a1628' }}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

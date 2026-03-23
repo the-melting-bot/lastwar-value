@@ -63,7 +63,7 @@ export default function ServerSearch({ selectedServerId, onSelect }: ServerSearc
 
   return (
     <div ref={dropdownRef} className="relative">
-      <label className="block text-sm font-medium text-gray-300 mb-1">
+      <label className="field-label">
         Server Number
       </label>
       <input
@@ -75,27 +75,36 @@ export default function ServerSearch({ selectedServerId, onSelect }: ServerSearc
         }}
         onFocus={() => setIsOpen(true)}
         placeholder="Search server number..."
-        className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+        className="input-field"
       />
 
       {isOpen && filtered.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+        <div
+          className="absolute z-50 w-full mt-1 rounded-xl shadow-2xl max-h-60 overflow-y-auto"
+          style={{ background: '#0f1d32', border: '1px solid rgba(255, 107, 0, 0.15)' }}
+        >
           {filtered.map((server) => (
             <button
               key={server.id}
               type="button"
               onClick={() => handleSelect(server)}
-              className="w-full px-4 py-2 text-left text-sm text-gray-200 hover:bg-gray-700 hover:text-orange-400 transition-colors"
+              className="w-full px-4 py-2.5 text-left text-sm text-slate-300 hover:text-orange-400 transition-colors"
+              style={{ borderBottom: '1px solid rgba(255, 107, 0, 0.05)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 107, 0, 0.05)')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               Server #{server.id}{' '}
-              <span className="text-gray-500">— {server.createdAt}</span>
+              <span className="text-slate-500">— {server.createdAt}</span>
             </button>
           ))}
         </div>
       )}
 
       {selectedInfo && (
-        <div className="mt-3 p-3 bg-gray-800/50 border border-gray-700 rounded-lg text-sm">
+        <div
+          className="mt-3 p-3 rounded-xl text-sm"
+          style={{ background: 'rgba(255, 107, 0, 0.05)', border: '1px solid rgba(255, 107, 0, 0.15)' }}
+        >
           <span className="text-green-400">✓</span>{' '}
           <span className="text-white font-medium">
             Server #{selectedInfo.id}
