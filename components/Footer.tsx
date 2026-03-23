@@ -13,13 +13,13 @@ export default function Footer() {
             >
               Last War Value
             </Link>
-            <p className="text-xs text-white/30 mt-1">
+            <p className="text-xs text-white/45 mt-1">
               Built by a Last War player, for Last War players
             </p>
           </div>
 
           {/* Links */}
-          <div className="flex items-center gap-6 text-sm text-white/40">
+          <div className="flex items-center gap-6 text-sm text-white/60">
             <Link
               href="/"
               className="hover:text-[#FFD700] transition-colors"
@@ -50,14 +50,14 @@ export default function Footer() {
         </div>
 
         <div className="mt-6 pt-4 border-t border-white/5 text-center">
-          <p className="text-xs text-white/25 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-xs text-white/40 leading-relaxed max-w-2xl mx-auto">
             Last War Value is an independent fan-made tool and is not affiliated
             with, endorsed by, or associated with Last War: Survival, First Fun
             Inc., or any of their subsidiaries. Last War: Survival is a
             trademark of First Fun Inc. All game-related content and imagery
             belong to their respective owners.
           </p>
-          <p className="text-xs text-white/20 mt-3">
+          <p className="text-xs text-white/35 mt-3">
             &copy; 2026 Last War Value
           </p>
         </div>

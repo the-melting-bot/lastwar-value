@@ -76,7 +76,7 @@ export default function Home() {
           <h2 className="text-3xl sm:text-4xl font-bold text-center text-white mb-3">
             How It Works
           </h2>
-          <p className="text-center text-white/50 mb-14 max-w-xl mx-auto">
+          <p className="text-center text-white/60 mb-14 max-w-xl mx-auto">
             Three steps to find out what your account is really worth
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -107,7 +107,7 @@ export default function Home() {
                 <h3 className="text-lg font-bold text-white mb-2">
                   {step.title}
                 </h3>
-                <p className="text-sm text-white/50 leading-relaxed">
+                <p className="text-sm text-white/60 leading-relaxed">
                   {step.desc}
                 </p>
               </div>
@@ -125,14 +125,14 @@ export default function Home() {
             <span className="text-white">We Analyze </span>
             <span className="value-gradient">Everything</span>
           </h2>
-          <p className="text-center text-white/50 mb-12 max-w-xl mx-auto">
+          <p className="text-center text-white/60 mb-12 max-w-xl mx-auto">
             Every corner of your account contributes to the final number
           </p>
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
             {CATEGORIES.map((cat) => (
               <div key={cat.name} className="category-card">
                 <span className="text-2xl">{cat.emoji}</span>
-                <span className="text-xs font-medium text-white/60 text-center leading-tight">
+                <span className="text-xs font-medium text-white/80 text-center leading-tight">
                   {cat.name}
                 </span>
               </div>
@@ -149,15 +149,15 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             <div>
               <p className="text-4xl font-extrabold value-gradient">2,212+</p>
-              <p className="text-sm text-white/50 mt-2">Servers Covered</p>
+              <p className="text-sm text-white/70 mt-2">Servers Covered</p>
             </div>
             <div>
               <p className="text-4xl font-extrabold value-gradient">13</p>
-              <p className="text-sm text-white/50 mt-2">Value Categories</p>
+              <p className="text-sm text-white/70 mt-2">Value Categories</p>
             </div>
             <div>
               <p className="text-4xl font-extrabold value-gradient">Daily</p>
-              <p className="text-sm text-white/50 mt-2">Server Data Updates</p>
+              <p className="text-sm text-white/70 mt-2">Server Data Updates</p>
             </div>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function Home() {
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                 Ready to Find Out?
               </h2>
-              <p className="text-white/50 mb-8 text-lg">
+              <p className="text-white/60 mb-8 text-lg">
                 It takes less than 60 seconds and costs nothing.
               </p>
               <Link
