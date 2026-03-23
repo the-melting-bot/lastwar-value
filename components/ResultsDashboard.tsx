@@ -28,10 +28,10 @@ export default function ResultsDashboard() {
   if (!latest) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-white mb-4">
+        <h2 className="text-2xl font-bold text-[#1A1A2E] mb-4">
           No evaluations yet
         </h2>
-        <p className="text-slate-400 mb-6">
+        <p className="text-[#4A4A68] mb-6">
           Complete an evaluation to see your results.
         </p>
         <button
@@ -89,24 +89,28 @@ export default function ResultsDashboard() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Section 1: Value Header */}
       <div className="card-static p-8 text-center">
-        <p className="text-slate-400 text-sm mb-3 tracking-wide uppercase font-medium">Your Base Value</p>
+        <p className="text-[#4A4A68] text-sm mb-3 tracking-wide uppercase font-medium">
+          Your Base Value
+        </p>
         <p className="text-5xl sm:text-6xl font-bold value-gradient mb-3">
           ${result.totalValue}
         </p>
-        <p className="text-slate-400 mb-3 text-lg">
+        <p className="text-[#4A4A68] mb-3 text-lg">
           ${result.lowRange} — ${result.highRange}
         </p>
         {change !== null && (
-          <p
-            className={`text-lg font-semibold ${
-              change >= 0 ? 'text-green-400' : 'text-red-400'
+          <span
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold ${
+              change >= 0
+                ? 'bg-green-50 text-green-600 border border-green-200'
+                : 'bg-red-50 text-red-600 border border-red-200'
             }`}
           >
             {change >= 0 ? '+' : ''}${change.toFixed(0)} ({changePct}%){' '}
             {change >= 0 ? '↑' : '↓'}
-          </p>
+          </span>
         )}
-        <p className="text-slate-500 text-sm mt-3">
+        <p className="text-[#9CA3AF] text-sm mt-3">
           Server #{serverInfo.id} — Day {serverInfo.day} — Season{' '}
           {serverInfo.season}
         </p>
@@ -121,27 +125,34 @@ export default function ResultsDashboard() {
       {/* Section 4: What Changed */}
       {changedCategories.length > 0 && (
         <div className="card-static p-6">
-          <h3 className="text-lg font-bold text-white mb-4">What Changed</h3>
+          <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">
+            What Changed
+          </h3>
           <div className="space-y-2">
             {changedCategories.map((c, i) => (
-              <div key={i} className="flex items-center justify-between text-sm py-1">
-                <span className="text-slate-300">
+              <div
+                key={i}
+                className="flex items-center justify-between text-sm py-1"
+              >
+                <span className="text-[#4A4A68]">
                   {c.emoji} {c.name}
                 </span>
                 <span
-                  className={`font-medium ${
-                    c.diff > 0 ? 'text-green-400' : 'text-red-400'
+                  className={`font-medium px-2.5 py-0.5 rounded-full text-xs ${
+                    c.diff > 0
+                      ? 'bg-green-50 text-green-600'
+                      : 'bg-red-50 text-red-600'
                   }`}
                 >
                   {c.diff > 0 ? '+' : ''}${Math.abs(c.diff).toFixed(0)}
                 </span>
               </div>
             ))}
-            <div className="pt-2 mt-2 flex justify-between font-bold text-sm" style={{ borderTop: '1px solid rgba(255, 107, 0, 0.1)' }}>
-              <span className="text-white">Net Change</span>
+            <div className="pt-2 mt-2 flex justify-between font-bold text-sm border-t border-gray-100">
+              <span className="text-[#1A1A2E]">Net Change</span>
               <span
                 className={
-                  change! >= 0 ? 'text-green-400' : 'text-red-400'
+                  change! >= 0 ? 'text-green-600' : 'text-red-600'
                 }
               >
                 {change! >= 0 ? '+' : ''}${change!.toFixed(0)}
@@ -153,25 +164,24 @@ export default function ResultsDashboard() {
 
       {/* Section 5: Recommendations */}
       <div className="card-static p-6">
-        <h3 className="text-lg font-bold text-white mb-4">
+        <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">
           💡 Invest Next
         </h3>
         <div className="space-y-3">
           {recommendations.map((rec, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl"
-              style={{ background: 'rgba(15, 29, 50, 0.5)', border: '1px solid rgba(255, 107, 0, 0.08)' }}
+              className="p-4 rounded-xl bg-[#FFF7ED] border border-[#FDBA74]/40"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-[#1A1A2E]">
                   {rec.category}
                 </span>
-                <span className="text-xs text-green-400 font-semibold">
+                <span className="text-xs text-green-600 font-semibold">
                   +${rec.estimatedBoost} potential
                 </span>
               </div>
-              <p className="text-xs text-slate-400">{rec.action}</p>
+              <p className="text-xs text-[#4A4A68]">{rec.action}</p>
             </div>
           ))}
         </div>
@@ -192,7 +202,7 @@ export default function ResultsDashboard() {
           {copied ? '✅ Copied!' : '📤 Share Results'}
         </button>
       </div>
-      <p className="text-center text-slate-500 text-sm">
+      <p className="text-center text-[#9CA3AF] text-sm">
         Next suggested eval:{' '}
         {nextEvalDate.toLocaleDateString('en-US', {
           month: 'short',

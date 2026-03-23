@@ -26,6 +26,29 @@ const OIL_TECH_OPTIONS = [
   'Maxed (100%)',
 ];
 
+const SKINS_OPTIONS = [
+  '0 Skins',
+  '1 Skin',
+  '2 Skins',
+  '3 Skins',
+  '4 Skins',
+  '5+ Skins',
+];
+
+const OVERLORD_OPTIONS = [
+  'Not Yet Unlocked',
+  'Level 1',
+  'Level 2',
+  'Level 3',
+  'Level 4',
+  'Level 5',
+  'Level 6',
+  'Level 7',
+  'Level 8',
+  'Level 9',
+  'Level 10',
+];
+
 const RSS_OPTIONS = ['Under 100M', '100M-500M', '500M-1B', '1B-5B', '5B+'];
 
 const MONEY_OPTIONS = [
@@ -58,7 +81,6 @@ export default function EvaluationWizard() {
   const [totalHeroPower, setTotalHeroPower] = useState('');
   const [heroPowerRank, setHeroPowerRank] = useState('');
 
-  // CHANGE 1: Squad type + total squad power (simplified — no per-hero powers)
   const [squadType, setSquadType] = useState<SquadType | ''>('');
   const [mainSquadPower, setMainSquadPower] = useState('');
 
@@ -66,13 +88,14 @@ export default function EvaluationWizard() {
     Array.from({ length: 5 }, () => ({ unlocked: false, level: 1 }))
   );
   const [droneLevel, setDroneLevel] = useState('');
-
-  // CHANGE 3: Drone component level + power
   const [droneComponentLevel, setDroneComponentLevel] = useState('1');
   const [droneComponentPower, setDroneComponentPower] = useState('');
 
-  const [skinsCount, setSkinsCount] = useState('');
-  const [overlordLevel, setOverlordLevel] = useState('');
+  // CHANGE 1: Skins as dropdown string
+  const [skinsCount, setSkinsCount] = useState('0 Skins');
+  // CHANGE 2: Overlord as dropdown string
+  const [overlordLevel, setOverlordLevel] = useState('Not Yet Unlocked');
+
   const [hqLevel, setHqLevel] = useState('15');
   const [oilTechTree, setOilTechTree] = useState('Not Unlocked');
   const [vipLevel, setVipLevel] = useState('7');
@@ -90,12 +113,7 @@ export default function EvaluationWizard() {
       setTotalHeroPower(formatNum(inp.totalHeroPower));
       setHeroPowerRank(inp.heroPowerRank.toString());
 
-      // Squad type
-      if (inp.squadType) {
-        setSquadType(inp.squadType);
-      }
-
-      // Backward compatible: compute total squad power from hero powers or use mainSquadPower
+      if (inp.squadType) setSquadType(inp.squadType);
       if (inp.mainSquadPower && inp.mainSquadPower > 0) {
         setMainSquadPower(formatNum(inp.mainSquadPower));
       } else if (inp.squadHeroes && Object.keys(inp.squadHeroes).length > 0) {
@@ -106,7 +124,6 @@ export default function EvaluationWizard() {
       setWeapons(inp.exclusiveWeapons);
       setDroneLevel(inp.droneLevel.toString());
 
-      // New drone component fields — gracefully handle old data
       if (inp.droneComponentLevel !== undefined && inp.droneComponentLevel > 0) {
         setDroneComponentLevel(inp.droneComponentLevel.toString());
       }
@@ -114,8 +131,28 @@ export default function EvaluationWizard() {
         setDroneComponentPower(formatNum(inp.droneComponentPower));
       }
 
-      setSkinsCount(inp.skinsCount.toString());
-      setOverlordLevel(inp.overlordLevel.toString());
+      // Backward compat: skinsCount may be number or string
+      if (typeof inp.skinsCount === 'string') {
+        setSkinsCount(inp.skinsCount);
+      } else if (typeof inp.skinsCount === 'number') {
+        // Convert old numeric to closest dropdown option
+        if (inp.skinsCount >= 5) setSkinsCount('5+ Skins');
+        else if (inp.skinsCount === 4) setSkinsCount('4 Skins');
+        else if (inp.skinsCount === 3) setSkinsCount('3 Skins');
+        else if (inp.skinsCount === 2) setSkinsCount('2 Skins');
+        else if (inp.skinsCount === 1) setSkinsCount('1 Skin');
+        else setSkinsCount('0 Skins');
+      }
+
+      // Backward compat: overlordLevel may be number or string
+      if (typeof inp.overlordLevel === 'string') {
+        setOverlordLevel(inp.overlordLevel);
+      } else if (typeof inp.overlordLevel === 'number') {
+        if (inp.overlordLevel >= 10) setOverlordLevel('Level 10');
+        else if (inp.overlordLevel >= 1) setOverlordLevel(`Level ${Math.min(inp.overlordLevel, 10)}`);
+        else setOverlordLevel('Not Yet Unlocked');
+      }
+
       setHqLevel(inp.hqLevel.toString());
       setOilTechTree(inp.oilTechTree);
       setVipLevel(inp.vipLevel.toString());
@@ -126,8 +163,6 @@ export default function EvaluationWizard() {
   }, []);
 
   const season = serverInfo?.season || 0;
-
-  // CHANGE 2: Get hero names for current squad type (for weapon labels)
   const currentHeroes = squadType ? SQUAD_HEROES[squadType] : [];
 
   function handleServerSelect(info: ServerInfo) {
@@ -135,10 +170,8 @@ export default function EvaluationWizard() {
     setServerId(info.id);
   }
 
-  // CHANGE 2: Reset weapons when squad type changes
   function handleSquadTypeChange(newType: SquadType | '') {
     setSquadType(newType);
-    // Reset weapons when squad type changes
     setWeapons(Array.from({ length: 5 }, () => ({ unlocked: false, level: 1 })));
   }
 
@@ -153,7 +186,6 @@ export default function EvaluationWizard() {
   function handleSubmit() {
     if (!serverInfo) return;
 
-    // Build a legacy-compatible squadHeroes record (empty — we no longer collect per-hero powers)
     const squadHeroesRecord: Record<string, number> = {};
     if (squadType) {
       const heroes = SQUAD_HEROES[squadType];
@@ -177,8 +209,8 @@ export default function EvaluationWizard() {
       droneLevel: parseInt(droneLevel, 10) || 0,
       droneComponentLevel: parseInt(droneComponentLevel, 10) || 1,
       droneComponentPower: parseNum(droneComponentPower),
-      skinsCount: parseInt(skinsCount, 10) || 0,
-      overlordLevel: parseInt(overlordLevel, 10) || 0,
+      skinsCount,
+      overlordLevel,
       hqLevel: parseInt(hqLevel, 10) || 15,
       oilTechTree,
       vipLevel: parseInt(vipLevel, 10) || 7,
@@ -222,157 +254,88 @@ export default function EvaluationWizard() {
 
       {/* Step 1: Server Info */}
       {step === 0 && (
-        <div className="card-static p-6 space-y-5 fade-in-up">
+        <div className="card-static p-6 sm:p-8 space-y-5 fade-in-up">
           <div>
-            <h2 className="text-xl font-bold text-white">Server Info</h2>
-            <p className="text-sm text-slate-400 mt-1">Find your server to calibrate baselines</p>
+            <h2 className="text-xl font-bold text-[#1A1A2E]">Server Info</h2>
+            <p className="text-sm text-[#4A4A68] mt-1">Find your server to calibrate baselines</p>
           </div>
-          <ServerSearch
-            selectedServerId={serverId}
-            onSelect={handleServerSelect}
-          />
+          <ServerSearch selectedServerId={serverId} onSelect={handleServerSelect} />
         </div>
       )}
 
       {/* Step 2: The Big Three */}
       {step === 1 && (
-        <div className="card-static p-6 space-y-5 fade-in-up">
+        <div className="card-static p-6 sm:p-8 space-y-5 fade-in-up">
           <div>
-            <h2 className="text-xl font-bold text-white">The Big Three</h2>
-            <p className="text-sm text-slate-400 mt-1">Core account metrics that drive your value</p>
+            <h2 className="text-xl font-bold text-[#1A1A2E]">The Big Three</h2>
+            <p className="text-sm text-[#4A4A68] mt-1">Core account metrics that drive your value</p>
           </div>
           <div>
             <label className="field-label">Decoration Power</label>
-            <input
-              type="text"
-              value={decorationPower}
-              onChange={(e) =>
-                handleNumericInput(e.target.value, setDecorationPower)
-              }
-              placeholder="e.g. 650,000"
-              className="input-field"
-            />
+            <input type="text" value={decorationPower} onChange={(e) => handleNumericInput(e.target.value, setDecorationPower)} placeholder="e.g. 650,000" className="input-field" />
           </div>
           <div>
             <label className="field-label">Total Hero Power</label>
-            <input
-              type="text"
-              value={totalHeroPower}
-              onChange={(e) =>
-                handleNumericInput(e.target.value, setTotalHeroPower)
-              }
-              placeholder="e.g. 12,000,000"
-              className="input-field"
-            />
+            <input type="text" value={totalHeroPower} onChange={(e) => handleNumericInput(e.target.value, setTotalHeroPower)} placeholder="e.g. 12,000,000" className="input-field" />
           </div>
           <div>
             <label className="field-label">Hero Power Server Rank</label>
-            <input
-              type="text"
-              value={heroPowerRank}
-              onChange={(e) =>
-                handleNumericInput(e.target.value, setHeroPowerRank, false)
-              }
-              placeholder="e.g. 15"
-              className="input-field"
-            />
+            <input type="text" value={heroPowerRank} onChange={(e) => handleNumericInput(e.target.value, setHeroPowerRank, false)} placeholder="e.g. 15" className="input-field" />
           </div>
         </div>
       )}
 
       {/* Step 3: Combat & Weapons */}
       {step === 2 && (
-        <div className="card-static p-6 space-y-5 fade-in-up">
+        <div className="card-static p-6 sm:p-8 space-y-5 fade-in-up">
           <div>
-            <h2 className="text-xl font-bold text-white">Combat &amp; Weapons</h2>
-            <p className="text-sm text-slate-400 mt-1">Squad composition, weapons, and drones</p>
+            <h2 className="text-xl font-bold text-[#1A1A2E]">Combat &amp; Weapons</h2>
+            <p className="text-sm text-[#4A4A68] mt-1">Squad composition, weapons, and drones</p>
           </div>
 
-          {/* CHANGE 1: Squad Type — button selector */}
           <div>
             <label className="field-label">Main Squad Type</label>
             <div className="grid grid-cols-3 gap-3">
               {(['Air', 'Tank', 'Missile'] as SquadType[]).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => handleSquadTypeChange(t)}
-                  className={`squad-btn ${squadType === t ? 'active' : ''}`}
-                >
+                <button key={t} type="button" onClick={() => handleSquadTypeChange(t)} className={`squad-btn ${squadType === t ? 'active' : ''}`}>
                   {t === 'Air' ? '✈️' : t === 'Tank' ? '🛡️' : '🚀'} {t}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* CHANGE 1: Hero names displayed as chips, single total power input */}
           {squadType && (
             <div className="space-y-3">
               <div>
                 <label className="field-label">Your Heroes</label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {currentHeroes.map((name) => (
-                    <span key={name} className="hero-chip">
-                      {name}
-                    </span>
+                    <span key={name} className="hero-chip">{name}</span>
                   ))}
                 </div>
               </div>
-
               <div>
                 <label className="field-label">Total Squad Power</label>
-                <input
-                  type="text"
-                  value={mainSquadPower}
-                  onChange={(e) =>
-                    handleNumericInput(e.target.value, setMainSquadPower)
-                  }
-                  placeholder="e.g. 12,000,000"
-                  className="input-field"
-                />
-                <p className="text-xs text-slate-500 mt-1">
-                  Combined power of all 5 heroes in your main squad
-                </p>
+                <input type="text" value={mainSquadPower} onChange={(e) => handleNumericInput(e.target.value, setMainSquadPower)} placeholder="e.g. 12,000,000" className="input-field" />
+                <p className="text-xs text-[#9CA3AF] mt-1">Combined power of all 5 heroes in your main squad</p>
               </div>
             </div>
           )}
 
-          {/* CHANGE 2: Exclusive Weapons — tied to hero names */}
           {squadType && (
             <div>
               <label className="field-label">Exclusive Weapons</label>
               <div className="space-y-2 mt-2">
                 {weapons.map((w, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-3 rounded-xl"
-                    style={{ background: 'rgba(15, 29, 50, 0.5)', border: '1px solid rgba(255, 107, 0, 0.08)' }}
-                  >
+                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#F9FAFB] border border-[#E5E7EB]">
                     <label className="flex items-center gap-2 cursor-pointer min-w-0">
-                      <input
-                        type="checkbox"
-                        checked={w.unlocked}
-                        onChange={(e) =>
-                          updateWeapon(i, 'unlocked', e.target.checked)
-                        }
-                        className="w-4 h-4 shrink-0"
-                      />
-                      <span className="text-sm text-slate-300 font-medium">
-                        {currentHeroes[i] || `Weapon ${i + 1}`}
-                      </span>
+                      <input type="checkbox" checked={w.unlocked} onChange={(e) => updateWeapon(i, 'unlocked', e.target.checked)} className="w-4 h-4 shrink-0" />
+                      <span className="text-sm text-[#1A1A2E] font-medium">{currentHeroes[i] || `Weapon ${i + 1}`}</span>
                     </label>
                     {w.unlocked && (
-                      <select
-                        value={w.level}
-                        onChange={(e) =>
-                          updateWeapon(i, 'level', parseInt(e.target.value, 10))
-                        }
-                        className="select-field !w-auto !py-2 !px-3 text-sm"
-                      >
+                      <select value={w.level} onChange={(e) => updateWeapon(i, 'level', parseInt(e.target.value, 10))} className="select-field !w-auto !py-2 !px-3 text-sm">
                         {Array.from({ length: 30 }, (_, j) => j + 1).map((l) => (
-                          <option key={l} value={l}>
-                            Lv. {l}
-                          </option>
+                          <option key={l} value={l}>Lv. {l}</option>
                         ))}
                       </select>
                     )}
@@ -383,114 +346,72 @@ export default function EvaluationWizard() {
           )}
 
           {!squadType && (
-            <div className="p-4 rounded-xl text-center text-slate-500 text-sm" style={{ background: 'rgba(15, 29, 50, 0.3)', border: '1px dashed rgba(255, 107, 0, 0.15)' }}>
+            <div className="p-4 rounded-xl text-center text-[#9CA3AF] text-sm bg-[#F9FAFB] border border-dashed border-[#D1D5DB]">
               Select a squad type above to configure weapons
             </div>
           )}
 
           <div>
             <label className="field-label">Drone Level</label>
-            <input
-              type="text"
-              value={droneLevel}
-              onChange={(e) =>
-                handleNumericInput(e.target.value, setDroneLevel, false)
-              }
-              placeholder="1-50"
-              className="input-field"
-            />
+            <input type="text" value={droneLevel} onChange={(e) => handleNumericInput(e.target.value, setDroneLevel, false)} placeholder="1-50" className="input-field" />
           </div>
-
-          {/* CHANGE 3: Renamed label */}
           <div>
             <label className="field-label">Overall Drone Components Level</label>
-            <select
-              value={droneComponentLevel}
-              onChange={(e) => setDroneComponentLevel(e.target.value)}
-              className="select-field"
-            >
+            <select value={droneComponentLevel} onChange={(e) => setDroneComponentLevel(e.target.value)} className="select-field">
               {Array.from({ length: 10 }, (_, i) => i + 1).map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
+                <option key={l} value={l}>{l}</option>
               ))}
             </select>
           </div>
-
           <div>
             <label className="field-label">Overall Drone Component Power</label>
-            <input
-              type="text"
-              value={droneComponentPower}
-              onChange={(e) =>
-                handleNumericInput(e.target.value, setDroneComponentPower)
-              }
-              placeholder="e.g. 450,000"
-              className="input-field"
-            />
+            <input type="text" value={droneComponentPower} onChange={(e) => handleNumericInput(e.target.value, setDroneComponentPower)} placeholder="e.g. 450,000" className="input-field" />
           </div>
         </div>
       )}
 
       {/* Step 4: Collection & Progression */}
       {step === 3 && (
-        <div className="card-static p-6 space-y-5 fade-in-up">
+        <div className="card-static p-6 sm:p-8 space-y-5 fade-in-up">
           <div>
-            <h2 className="text-xl font-bold text-white">Collection &amp; Progression</h2>
-            <p className="text-sm text-slate-400 mt-1">Skins, overlord, HQ, and tech investments</p>
+            <h2 className="text-xl font-bold text-[#1A1A2E]">Collection &amp; Progression</h2>
+            <p className="text-sm text-[#4A4A68] mt-1">Skins, overlord, HQ, and tech investments</p>
           </div>
+
+          {/* CHANGE 1: Skins dropdown */}
           <div>
-            <label className="field-label">Base/Drone Skins Count</label>
-            <input
-              type="text"
-              value={skinsCount}
-              onChange={(e) =>
-                handleNumericInput(e.target.value, setSkinsCount, false)
-              }
-              placeholder="e.g. 8"
-              className="input-field"
-            />
+            <label className="field-label">Base/Drone Skins</label>
+            <select value={skinsCount} onChange={(e) => setSkinsCount(e.target.value)} className="select-field">
+              {SKINS_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
 
           {season >= 2 && (
             <>
+              {/* CHANGE 2: Overlord dropdown */}
               <div>
                 <label className="field-label">Overlord Level</label>
-                <input
-                  type="text"
-                  value={overlordLevel}
-                  onChange={(e) =>
-                    handleNumericInput(e.target.value, setOverlordLevel, false)
-                  }
-                  placeholder="e.g. 25"
-                  className="input-field"
-                />
+                <select value={overlordLevel} onChange={(e) => setOverlordLevel(e.target.value)} className="select-field">
+                  {OVERLORD_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="field-label">HQ Level</label>
-                <select
-                  value={hqLevel}
-                  onChange={(e) => setHqLevel(e.target.value)}
-                  className="select-field"
-                >
+                <select value={hqLevel} onChange={(e) => setHqLevel(e.target.value)} className="select-field">
                   {Array.from({ length: 30 }, (_, i) => i + 1).map((l) => (
-                    <option key={l} value={l}>
-                      {l}
-                    </option>
+                    <option key={l} value={l}>{l}</option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="field-label">Oil Tech Tree</label>
-                <select
-                  value={oilTechTree}
-                  onChange={(e) => setOilTechTree(e.target.value)}
-                  className="select-field"
-                >
+                <select value={oilTechTree} onChange={(e) => setOilTechTree(e.target.value)} className="select-field">
                   {OIL_TECH_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
+                    <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
               </div>
@@ -501,66 +422,36 @@ export default function EvaluationWizard() {
 
       {/* Step 5: Resources */}
       {step === 4 && (
-        <div className="card-static p-6 space-y-5 fade-in-up">
+        <div className="card-static p-6 sm:p-8 space-y-5 fade-in-up">
           <div>
-            <h2 className="text-xl font-bold text-white">Resources</h2>
-            <p className="text-sm text-slate-400 mt-1">VIP status, reserves, and spending</p>
+            <h2 className="text-xl font-bold text-[#1A1A2E]">Resources</h2>
+            <p className="text-sm text-[#4A4A68] mt-1">VIP status, reserves, and spending</p>
           </div>
           <div>
             <label className="field-label">VIP Level</label>
-            <select
-              value={vipLevel}
-              onChange={(e) => setVipLevel(e.target.value)}
-              className="select-field"
-            >
+            <select value={vipLevel} onChange={(e) => setVipLevel(e.target.value)} className="select-field">
               {Array.from({ length: 18 }, (_, i) => i + 1).map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
+                <option key={l} value={l}>{l}</option>
               ))}
             </select>
           </div>
           <div>
             <label className="field-label">RSS Reserves</label>
-            <select
-              value={rssReserves}
-              onChange={(e) => setRssReserves(e.target.value)}
-              className="select-field"
-            >
-              {RSS_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
+            <select value={rssReserves} onChange={(e) => setRssReserves(e.target.value)} className="select-field">
+              {RSS_OPTIONS.map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
             </select>
           </div>
           <div>
             <label className="field-label">Diamonds</label>
-            <input
-              type="text"
-              value={diamonds}
-              onChange={(e) => handleNumericInput(e.target.value, setDiamonds)}
-              placeholder="e.g. 85,000"
-              className="input-field"
-            />
+            <input type="text" value={diamonds} onChange={(e) => handleNumericInput(e.target.value, setDiamonds)} placeholder="e.g. 85,000" className="input-field" />
           </div>
           <div>
             <label className="field-label">
               Total Money Spent{' '}
-              <span className="text-slate-500 font-normal">
-                (Optional — helps calibrate but is never shared)
-              </span>
+              <span className="text-[#9CA3AF] font-normal">(Optional — helps calibrate but is never shared)</span>
             </label>
-            <select
-              value={totalMoneySpent}
-              onChange={(e) => setTotalMoneySpent(e.target.value)}
-              className="select-field"
-            >
-              {MONEY_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
+            <select value={totalMoneySpent} onChange={(e) => setTotalMoneySpent(e.target.value)} className="select-field">
+              {MONEY_OPTIONS.map((opt) => (<option key={opt} value={opt}>{opt}</option>))}
             </select>
           </div>
         </div>
@@ -569,11 +460,7 @@ export default function EvaluationWizard() {
       {/* Navigation */}
       <div className="flex justify-between mt-8">
         {step > 0 ? (
-          <button
-            type="button"
-            onClick={() => setStep(step - 1)}
-            className="btn-secondary px-6 py-3"
-          >
+          <button type="button" onClick={() => setStep(step - 1)} className="btn-secondary px-6 py-3">
             ← Back
           </button>
         ) : (
@@ -581,20 +468,11 @@ export default function EvaluationWizard() {
         )}
 
         {step < 4 ? (
-          <button
-            type="button"
-            onClick={() => setStep(step + 1)}
-            disabled={step === 0 && !serverInfo}
-            className="btn-primary px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none disabled:transform-none"
-          >
+          <button type="button" onClick={() => setStep(step + 1)} disabled={step === 0 && !serverInfo} className="btn-primary px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none">
             Next →
           </button>
         ) : (
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="btn-primary px-10 py-3 text-lg"
-          >
+          <button type="button" onClick={handleSubmit} className="btn-primary btn-pulse px-10 py-3.5 text-lg">
             Get My Value →
           </button>
         )}

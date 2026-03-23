@@ -1,156 +1,152 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #0a1628;
-  --color-foreground: #ffffff;
-  --color-navy-900: #0a1628;
-  --color-navy-800: #0f1d32;
-  --color-navy-700: #142540;
-  --color-navy-600: #1a2d4e;
-  --color-navy-500: #1e3a5f;
-  --color-orange-500: #FF6B00;
-  --color-orange-400: #FF8A33;
-  --color-orange-600: #E05E00;
-  --color-blue-500: #00A3FF;
-  --color-blue-400: #33B5FF;
-  --color-gold-400: #FFD700;
-  --color-gold-500: #FFC107;
+  --color-background: #FFFFFF;
+  --color-foreground: #1A1A2E;
   --font-sans: var(--font-inter);
 }
 
 /* ─── Base ────────────────────────────────────── */
 body {
-  background: #0a1628;
-  color: #e2e8f0;
+  background: #FFFFFF;
+  color: #1A1A2E;
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
 }
 
-/* ─── Animated background grid ────────────────── */
-@keyframes gridPulse {
-  0%, 100% { opacity: 0.03; }
-  50% { opacity: 0.07; }
+/* ─── Hero gradient background ────────────────── */
+.hero-gradient {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF3D00 50%, #FFB800 100%);
+  position: relative;
+  overflow: hidden;
 }
 
-.animated-grid {
+/* Subtle animated background pattern */
+@keyframes heroShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.hero-gradient::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,107,0,0.9) 0%, rgba(255,61,0,0.85) 40%, rgba(255,184,0,0.9) 100%);
+  background-size: 200% 200%;
+  animation: heroShift 12s ease-in-out infinite;
+}
+
+/* Hero grid pattern overlay */
+.hero-pattern {
+  position: absolute;
+  inset: 0;
   background-image:
-    linear-gradient(rgba(0, 163, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 163, 255, 0.05) 1px, transparent 1px);
-  background-size: 48px 48px;
-  animation: gridPulse 6s ease-in-out infinite;
+    linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
 }
 
-/* ─── Glow orbs (hero background) ─────────────── */
-@keyframes float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-30px) scale(1.05); }
-}
-
-.glow-orb-orange {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255, 107, 0, 0.15) 0%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: float 8s ease-in-out infinite;
-}
-
-.glow-orb-blue {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(0, 163, 255, 0.12) 0%, transparent 70%);
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: float 10s ease-in-out infinite reverse;
+/* CTA gradient section */
+.cta-gradient {
+  background: linear-gradient(135deg, #FF6B00 0%, #E85D00 50%, #FFB800 100%);
 }
 
 /* ─── Card styles ─────────────────────────────── */
 .card {
-  background: linear-gradient(135deg, rgba(15, 29, 50, 0.8) 0%, rgba(10, 22, 40, 0.9) 100%);
-  border: 1px solid rgba(255, 107, 0, 0.1);
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
   border-radius: 16px;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  border-color: rgba(255, 107, 0, 0.25);
-  box-shadow: 0 8px 32px rgba(255, 107, 0, 0.08);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.04);
+  transform: translateY(-3px);
 }
 
 .card-static {
-  background: linear-gradient(135deg, rgba(15, 29, 50, 0.8) 0%, rgba(10, 22, 40, 0.9) 100%);
-  border: 1px solid rgba(255, 107, 0, 0.1);
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
   border-radius: 16px;
-  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
 }
 
-/* ─── Gradient buttons ────────────────────────── */
+/* ─── Buttons ─────────────────────────────────── */
 .btn-primary {
-  background: linear-gradient(135deg, #FF6B00 0%, #FF8A33 100%);
+  background: linear-gradient(135deg, #FF6B00 0%, #FFB800 100%);
   color: white;
   font-weight: 700;
-  border-radius: 12px;
+  border-radius: 999px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(255, 107, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(255,107,0,0.3);
   position: relative;
   overflow: hidden;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 8px 32px rgba(255, 107, 0, 0.5);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(255,107,0,0.45);
+  transform: translateY(-1px) scale(1.02);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .btn-secondary {
-  background: linear-gradient(135deg, rgba(20, 37, 64, 0.8) 0%, rgba(26, 45, 78, 0.8) 100%);
-  border: 1px solid rgba(255, 107, 0, 0.2);
-  color: white;
+  background: transparent;
+  border: 2px solid #FF6B00;
+  color: #FF6B00;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 999px;
   transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
-  border-color: rgba(255, 107, 0, 0.5);
-  box-shadow: 0 4px 20px rgba(255, 107, 0, 0.1);
+  background: rgba(255,107,0,0.06);
+  box-shadow: 0 2px 12px rgba(255,107,0,0.15);
+}
+
+/* Pulse animation for CTA */
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(255,107,0,0.3); }
+  50% { box-shadow: 0 4px 24px rgba(255,107,0,0.5), 0 0 40px rgba(255,107,0,0.15); }
+}
+
+.btn-pulse {
+  animation: ctaPulse 3s ease-in-out infinite;
 }
 
 /* ─── Form inputs ─────────────────────────────── */
 .input-field {
   width: 100%;
-  padding: 12px 16px;
-  background: rgba(15, 29, 50, 0.6);
-  border: 1px solid rgba(255, 107, 0, 0.15);
+  padding: 14px 16px;
+  background: #FFFFFF;
+  border: 1.5px solid #D1D5DB;
   border-radius: 12px;
-  color: #e2e8f0;
+  color: #1A1A2E;
   transition: all 0.3s ease;
   font-size: 0.95rem;
 }
 
 .input-field::placeholder {
-  color: #4a5568;
+  color: #9CA3AF;
 }
 
 .input-field:focus {
   outline: none;
   border-color: #FF6B00;
-  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15), 0 0 20px rgba(255, 107, 0, 0.08);
+  box-shadow: 0 0 0 3px rgba(255,107,0,0.12);
 }
 
 .select-field {
   width: 100%;
-  padding: 12px 16px;
-  background: rgba(15, 29, 50, 0.6);
-  border: 1px solid rgba(255, 107, 0, 0.15);
+  padding: 14px 16px;
+  background: #FFFFFF;
+  border: 1.5px solid #D1D5DB;
   border-radius: 12px;
-  color: #e2e8f0;
+  color: #1A1A2E;
   transition: all 0.3s ease;
   font-size: 0.95rem;
   appearance: none;
@@ -163,68 +159,32 @@ body {
 .select-field:focus {
   outline: none;
   border-color: #FF6B00;
-  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.15), 0 0 20px rgba(255, 107, 0, 0.08);
+  box-shadow: 0 0 0 3px rgba(255,107,0,0.12);
 }
 
-/* ─── Label ───────────────────────────────────── */
+/* ─── Labels ──────────────────────────────────── */
 .field-label {
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #94a3b8;
+  font-weight: 600;
+  color: #1A1A2E;
   margin-bottom: 6px;
 }
 
-/* ─── Progress bar gradient ───────────────────── */
+/* ─── Progress bar ────────────────────────────── */
 .progress-fill {
-  background: linear-gradient(90deg, #FF6B00 0%, #FFD700 100%);
+  background: linear-gradient(90deg, #FF6B00 0%, #FFB800 100%);
   border-radius: 999px;
   height: 100%;
   transition: width 0.4s ease;
 }
 
-/* ─── Stat counter glow ───────────────────────── */
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-.shimmer-text {
-  background: linear-gradient(90deg, #FF6B00, #FFD700, #FF6B00);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 4s linear infinite;
-}
-
-/* ─── Value display gradient ──────────────────── */
+/* ─── Value display ───────────────────────────── */
 .value-gradient {
-  background: linear-gradient(135deg, #FFD700 0%, #FF6B00 100%);
+  background: linear-gradient(135deg, #FF6B00 0%, #FFB800 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* ─── Section divider ─────────────────────────── */
-.section-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 107, 0, 0.2), transparent);
-}
-
-/* ─── Scrollbar ───────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #0f1d32;
-}
-::-webkit-scrollbar-thumb {
-  background: #1e3a5f;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #2a4a72;
 }
 
 /* ─── Hero name chips ─────────────────────────── */
@@ -232,37 +192,38 @@ body {
   display: inline-flex;
   align-items: center;
   padding: 6px 14px;
-  background: rgba(0, 163, 255, 0.1);
-  border: 1px solid rgba(0, 163, 255, 0.2);
+  background: #FFF7ED;
+  border: 1px solid #FDBA74;
   border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #33B5FF;
+  color: #EA580C;
   transition: all 0.2s ease;
 }
 
 /* ─── Squad type selector ─────────────────────── */
 .squad-btn {
-  padding: 10px 20px;
+  padding: 12px 20px;
   border-radius: 12px;
   font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.3s ease;
-  border: 1px solid rgba(255, 107, 0, 0.15);
-  background: rgba(15, 29, 50, 0.6);
-  color: #94a3b8;
+  border: 1.5px solid #D1D5DB;
+  background: #FFFFFF;
+  color: #4A4A68;
 }
 
 .squad-btn:hover {
-  border-color: rgba(255, 107, 0, 0.3);
-  color: #e2e8f0;
+  border-color: #FF6B00;
+  color: #FF6B00;
+  background: #FFF7ED;
 }
 
 .squad-btn.active {
-  background: linear-gradient(135deg, rgba(255, 107, 0, 0.2), rgba(255, 107, 0, 0.1));
+  background: linear-gradient(135deg, #FFF7ED, #FFEDD5);
   border-color: #FF6B00;
-  color: #FF8A33;
-  box-shadow: 0 0 20px rgba(255, 107, 0, 0.15);
+  color: #FF6B00;
+  box-shadow: 0 2px 12px rgba(255,107,0,0.15);
 }
 
 /* ─── Checkbox override ───────────────────────── */
@@ -270,30 +231,32 @@ input[type="checkbox"] {
   accent-color: #FF6B00;
 }
 
-/* ─── Category grid item ──────────────────────── */
-.category-item {
-  padding: 14px 16px;
-  background: rgba(15, 29, 50, 0.5);
-  border: 1px solid rgba(255, 107, 0, 0.08);
-  border-radius: 12px;
+/* ─── Category pills (landing page) ───────────── */
+.category-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4A4A68;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   transition: all 0.2s ease;
 }
 
-.category-item:hover {
-  border-color: rgba(255, 107, 0, 0.2);
-  background: rgba(15, 29, 50, 0.7);
+.category-pill:hover {
+  border-color: #FF6B00;
+  box-shadow: 0 2px 8px rgba(255,107,0,0.1);
+  transform: translateY(-1px);
 }
 
 /* ─── Fade-in animation ───────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .fade-in-up {
@@ -303,3 +266,47 @@ input[type="checkbox"] {
 .fade-in-up-delay-1 { animation-delay: 0.1s; opacity: 0; }
 .fade-in-up-delay-2 { animation-delay: 0.2s; opacity: 0; }
 .fade-in-up-delay-3 { animation-delay: 0.3s; opacity: 0; }
+
+/* ─── Scrollbar ───────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* ─── Trust badges ────────────────────────────── */
+.trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
+}
+
+/* ─── Number badge (steps) ────────────────────── */
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF6B00, #FFB800);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Warm section background ─────────────────── */
+.bg-warm {
+  background: #FFF7ED;
+}

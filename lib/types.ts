@@ -53,8 +53,8 @@ export interface EvaluationInput {
   droneComponentPower: number; // overall component power
 
   // Step 4
-  skinsCount: number;
-  overlordLevel: number;
+  skinsCount: string; // dropdown: "0 Skins" | "1 Skin" | ... | "5+ Skins"
+  overlordLevel: string; // dropdown: "Not Yet Unlocked" | "Level 1" | ... | "Level 10"
   hqLevel: number;
   oilTechTree: string; // new options: "Not Unlocked" | "Less than 20%" | "20% - 50%" | "50% - 80%" | "Above 80%" | "Maxed (100%)"
 

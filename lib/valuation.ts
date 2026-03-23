@@ -39,6 +39,8 @@ const DRONE_LEVEL_ANCHORS: Anchor[] = [
   { day: 900, value: 40 },
 ];
 
+// Skins scoring is now direct from dropdown (no anchors needed)
+// Kept for backward compatibility with old numeric evals
 const SKINS_COUNT_ANCHORS: Anchor[] = [
   { day: 100, value: 1 },
   { day: 300, value: 4 },
@@ -46,6 +48,59 @@ const SKINS_COUNT_ANCHORS: Anchor[] = [
   { day: 700, value: 12 },
   { day: 900, value: 18 },
 ];
+
+function scoreSkinsDropdown(skins: string | number): number {
+  if (typeof skins === 'number') {
+    // Legacy numeric support
+    if (skins >= 5) return 2.0;
+    if (skins >= 4) return 1.6;
+    if (skins >= 3) return 1.2;
+    if (skins >= 2) return 0.9;
+    if (skins >= 1) return 0.5;
+    return 0.2;
+  }
+  switch (skins) {
+    case '5+ Skins': return 2.0;
+    case '4 Skins': return 1.6;
+    case '3 Skins': return 1.2;
+    case '2 Skins': return 0.9;
+    case '1 Skin': return 0.5;
+    case '0 Skins': return 0.2;
+    default: return 0.2;
+  }
+}
+
+function scoreOverlordDropdown(level: string | number, season: number): number {
+  if (season < 2) return 0;
+  if (typeof level === 'number') {
+    // Legacy numeric support
+    if (level >= 10) return 2.0;
+    if (level >= 9) return 1.85;
+    if (level >= 8) return 1.7;
+    if (level >= 7) return 1.55;
+    if (level >= 6) return 1.4;
+    if (level >= 5) return 1.25;
+    if (level >= 4) return 1.1;
+    if (level >= 3) return 0.9;
+    if (level >= 2) return 0.7;
+    if (level >= 1) return 0.5;
+    return 0.2;
+  }
+  switch (level) {
+    case 'Level 10': return 2.0;
+    case 'Level 9': return 1.85;
+    case 'Level 8': return 1.7;
+    case 'Level 7': return 1.55;
+    case 'Level 6': return 1.4;
+    case 'Level 5': return 1.25;
+    case 'Level 4': return 1.1;
+    case 'Level 3': return 0.9;
+    case 'Level 2': return 0.7;
+    case 'Level 1': return 0.5;
+    case 'Not Yet Unlocked': return 0.2;
+    default: return 0.2;
+  }
+}
 
 const DRONE_COMPONENT_POWER_ANCHORS: Anchor[] = [
   { day: 100, value: 50000 },
@@ -143,14 +198,8 @@ function scoreMainSquad(input: EvaluationInput, day: number): { score: number; p
   };
 }
 
-function scoreOverlordLevel(level: number, season: number): number {
-  if (season < 2) return 0;
-  if (level >= 40) return 2.0;
-  if (level >= 30) return 1.5;
-  if (level >= 20) return 1.1;
-  if (level >= 10) return 0.8;
-  return 0.5;
-}
+// Legacy scoreOverlordLevel kept for reference but no longer used directly
+// New scoring is via scoreOverlordDropdown above
 
 function scoreHqLevel(level: number, season: number): number {
   if (season < 2) return 0;
@@ -339,11 +388,10 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
     baseline: Math.round(droneBaseline),
   };
 
-  const skinsBaseline = interpolate(SKINS_COUNT_ANCHORS, day);
   scores.skinsCount = {
-    score: input.skinsCount / skinsBaseline,
+    score: scoreSkinsDropdown(input.skinsCount),
     playerValue: input.skinsCount,
-    baseline: Math.round(skinsBaseline),
+    baseline: '3 Skins',
   };
 
   // Direct scoring
@@ -375,9 +423,9 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
   };
 
   scores.overlordLevel = {
-    score: scoreOverlordLevel(input.overlordLevel, season),
+    score: scoreOverlordDropdown(input.overlordLevel, season),
     playerValue: season >= 2 ? input.overlordLevel : 'N/A',
-    baseline: season >= 2 ? '20' : 'N/A',
+    baseline: season >= 2 ? 'Level 5' : 'N/A',
   };
 
   scores.hqLevel = {

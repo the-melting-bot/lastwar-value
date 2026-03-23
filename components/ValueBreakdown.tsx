@@ -8,20 +8,20 @@ interface ValueBreakdownProps {
   input?: EvaluationInput;
 }
 
-function getLabelColor(label: string): string {
+function getLabelStyle(label: string): { text: string; bg: string; border: string } {
   switch (label) {
     case 'LOW':
-      return 'text-red-400';
+      return { text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' };
     case 'AVERAGE':
-      return 'text-yellow-400';
+      return { text: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200' };
     case 'ABOVE AVG':
-      return 'text-green-400';
+      return { text: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' };
     case 'HIGH':
-      return 'text-emerald-400';
+      return { text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' };
     case 'EXCEPTIONAL':
-      return 'text-orange-400';
+      return { text: 'text-[#FF6B00]', bg: 'bg-orange-50', border: 'border-orange-200' };
     default:
-      return 'text-slate-500';
+      return { text: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-200' };
   }
 }
 
@@ -36,9 +36,9 @@ function getBarGradient(label: string): string {
     case 'HIGH':
       return 'linear-gradient(90deg, #10b981, #34d399)';
     case 'EXCEPTIONAL':
-      return 'linear-gradient(90deg, #FF6B00, #FFD700)';
+      return 'linear-gradient(90deg, #FF6B00, #FFB800)';
     default:
-      return 'linear-gradient(90deg, #475569, #64748b)';
+      return 'linear-gradient(90deg, #9ca3af, #d1d5db)';
   }
 }
 
@@ -60,18 +60,21 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
 
   return (
     <div className="card-static p-6">
-      <h3 className="text-lg font-bold text-white mb-4">Value Breakdown</h3>
+      <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">Value Breakdown</h3>
       <div className="space-y-3">
-        {active.map((cat) => {
+        {active.map((cat, idx) => {
           const isExpanded = expandedKey === cat.key;
           const hasExpandableDetail =
             cat.key === 'mainSquadPower' && squadHeroEntries.length > 0;
+          const labelStyle = getLabelStyle(cat.label);
+          const isEven = idx % 2 === 0;
 
           return (
             <div
               key={cat.key}
-              className="p-3.5 rounded-xl"
-              style={{ background: 'rgba(15, 29, 50, 0.5)', border: '1px solid rgba(255, 107, 0, 0.08)' }}
+              className={`p-3.5 rounded-xl border border-gray-100 ${
+                isEven ? 'bg-white' : 'bg-[#FAFAFA]'
+              }`}
             >
               <div
                 className={`flex items-center justify-between mb-1.5 ${
@@ -85,17 +88,19 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
               >
                 <div className="flex items-center gap-2">
                   <span>{cat.emoji}</span>
-                  <span className="text-sm font-medium text-white">
+                  <span className="text-sm font-medium text-[#1A1A2E]">
                     {cat.name}
                   </span>
                   {hasExpandableDetail && (
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-[#9CA3AF]">
                       {isExpanded ? '▾' : '▸'}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`text-xs font-bold ${getLabelColor(cat.label)}`}>
+                  <span
+                    className={`text-xs font-bold px-2 py-0.5 rounded-full border ${labelStyle.text} ${labelStyle.bg} ${labelStyle.border}`}
+                  >
                     {cat.label}
                   </span>
                   <span className="text-sm font-bold value-gradient">
@@ -104,15 +109,15 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                 </div>
               </div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-[#4A4A68]">
                   You: {formatValue(cat.playerValue)}
                 </span>
-                <span className="text-xs text-slate-600">|</span>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-[#D1D5DB]">|</span>
+                <span className="text-xs text-[#9CA3AF]">
                   Avg: {formatValue(cat.baseline)}
                 </span>
               </div>
-              <div className="w-full rounded-full h-1.5" style={{ background: 'rgba(15, 29, 50, 0.8)' }}>
+              <div className="w-full rounded-full h-1.5 bg-[#F3F4F6]">
                 <div
                   className="h-1.5 rounded-full transition-all"
                   style={{
@@ -124,9 +129,9 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
 
               {/* Expandable hero detail for Main Squad */}
               {isExpanded && cat.key === 'mainSquadPower' && (
-                <div className="mt-3 pt-3 space-y-1" style={{ borderTop: '1px solid rgba(255, 107, 0, 0.1)' }}>
+                <div className="mt-3 pt-3 space-y-1 border-t border-gray-100">
                   {input?.squadType && (
-                    <p className="text-xs text-orange-400 font-medium mb-1">
+                    <p className="text-xs text-[#FF6B00] font-medium mb-1">
                       {input.squadType} Squad
                     </p>
                   )}
@@ -135,8 +140,8 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                       key={name}
                       className="flex items-center justify-between text-xs"
                     >
-                      <span className="text-slate-400">{name}</span>
-                      <span className="text-slate-300">
+                      <span className="text-[#4A4A68]">{name}</span>
+                      <span className="text-[#1A1A2E] font-medium">
                         {power.toLocaleString('en-US')}
                       </span>
                     </div>

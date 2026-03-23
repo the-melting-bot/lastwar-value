@@ -19,79 +19,72 @@ const CATEGORIES = [
 export default function Home() {
   return (
     <div>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-[90vh] flex items-center justify-center">
-        <div className="animated-grid absolute inset-0" />
-        <div className="glow-orb-orange" style={{ top: '10%', left: '15%' }} />
-        <div className="glow-orb-blue" style={{ bottom: '10%', right: '10%' }} />
-
+      {/* ── Hero Section ── */}
+      <section className="hero-gradient relative min-h-[92vh] flex items-center justify-center">
+        <div className="hero-pattern" />
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <p className="text-sm font-semibold tracking-widest uppercase mb-4" style={{ color: '#FF8A33' }}>
-            Last War: Survival Account Tool
+          <p className="text-sm font-semibold tracking-[0.2em] uppercase mb-5 text-white/90">
+            THE #1 LAST WAR ACCOUNT TOOL
           </p>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold mb-6 tracking-tight text-white leading-tight">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-6 tracking-tight text-white leading-tight">
             What&apos;s Your Base{' '}
-            <span className="value-gradient">Worth?</span>
+            <span className="text-[#FFD700] drop-shadow-[0_2px_12px_rgba(255,215,0,0.4)]">
+              Worth?
+            </span>
           </h1>
-          <p className="text-lg sm:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Get a data-driven dollar estimate of your Last War account in 60 seconds.
-            Track your growth over time. Know before you trade.
+          <p className="text-lg sm:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Get a data-driven dollar estimate of your Last War account in 60
+            seconds. Track your growth over time. Know before you trade.
           </p>
           <Link
             href="/evaluate"
-            className="btn-primary inline-flex items-center gap-2 px-10 py-4 text-lg"
+            className="btn-primary btn-pulse inline-flex items-center gap-2 px-10 py-4 text-lg"
           >
             Value My Account →
           </Link>
-          <p className="text-xs text-slate-500 mt-4">
-            Free to use — no login required
-          </p>
+          <div className="flex items-center justify-center gap-6 mt-8">
+            <span className="trust-badge">✅ Free to use</span>
+            <span className="trust-badge">🔒 No login required</span>
+            <span className="trust-badge">⚡ 60-second valuation</span>
+          </div>
         </div>
       </section>
 
-      {/* Divider */}
-      <div className="section-divider" />
-
-      {/* How It Works */}
-      <section className="py-20 px-4">
+      {/* ── How It Works ── */}
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1A1A2E] mb-4">
             How It Works
           </h2>
-          <p className="text-center text-slate-400 mb-14 max-w-xl mx-auto">
+          <p className="text-center text-[#4A4A68] mb-14 max-w-xl mx-auto">
             Three steps to find out what your account is really worth
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="card p-7 text-center fade-in-up fade-in-up-delay-1">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4" style={{ background: 'linear-gradient(135deg, rgba(255, 107, 0, 0.15), rgba(255, 107, 0, 0.05))' }}>
-                📋
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">
+              <div className="step-number mx-auto mb-4">1</div>
+              <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">
                 Enter Your Stats
               </h3>
-              <p className="text-sm text-slate-400 leading-relaxed">
-                Quick 5-step wizard covering heroes, weapons, drones, and resources
+              <p className="text-sm text-[#4A4A68] leading-relaxed">
+                Quick 5-step wizard covering heroes, weapons, drones, and
+                resources
               </p>
             </div>
             <div className="card p-7 text-center fade-in-up fade-in-up-delay-2">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4" style={{ background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05))' }}>
-                💰
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">
+              <div className="step-number mx-auto mb-4">2</div>
+              <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">
                 Get Your Dollar Value
               </h3>
-              <p className="text-sm text-slate-400 leading-relaxed">
+              <p className="text-sm text-[#4A4A68] leading-relaxed">
                 Algorithm scores 13 categories against server-age baselines
               </p>
             </div>
             <div className="card p-7 text-center fade-in-up fade-in-up-delay-3">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4" style={{ background: 'linear-gradient(135deg, rgba(0, 163, 255, 0.15), rgba(0, 163, 255, 0.05))' }}>
-                📈
-              </div>
-              <h3 className="text-lg font-bold text-white mb-2">
+              <div className="step-number mx-auto mb-4">3</div>
+              <h3 className="text-lg font-bold text-[#1A1A2E] mb-2">
                 Track Your Growth
               </h3>
-              <p className="text-sm text-slate-400 leading-relaxed">
+              <p className="text-sm text-[#4A4A68] leading-relaxed">
                 Re-evaluate over time and watch your account value climb
               </p>
             </div>
@@ -99,64 +92,60 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="section-divider" />
-
-      {/* 13 Categories Grid */}
-      <section className="py-20 px-4">
+      {/* ── 13 Categories ── */}
+      <section className="py-20 px-4 bg-warm">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1A1A2E] mb-4">
             13 Value Categories
           </h2>
-          <p className="text-center text-slate-400 mb-12 max-w-xl mx-auto">
+          <p className="text-center text-[#4A4A68] mb-12 max-w-xl mx-auto">
             Every corner of your account contributes to the final number
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             {CATEGORIES.map((cat) => (
-              <div key={cat.name} className="category-item">
-                <span className="text-lg mr-2">{cat.emoji}</span>
-                <span className="text-sm font-medium text-slate-300">{cat.name}</span>
+              <div key={cat.name} className="category-pill">
+                <span className="text-lg">{cat.emoji}</span>
+                <span>{cat.name}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <div className="section-divider" />
-
-      {/* Social Proof Stats */}
-      <section className="py-16 px-4">
+      {/* ── Stats ── */}
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-3xl font-bold shimmer-text">2,212+</p>
-              <p className="text-sm text-slate-400 mt-1">Servers Covered</p>
+              <p className="text-4xl font-extrabold value-gradient">2,212+</p>
+              <p className="text-sm text-[#4A4A68] mt-2">Servers Covered</p>
             </div>
             <div>
-              <p className="text-3xl font-bold shimmer-text">13</p>
-              <p className="text-sm text-slate-400 mt-1">Value Categories</p>
+              <p className="text-4xl font-extrabold value-gradient">13</p>
+              <p className="text-sm text-[#4A4A68] mt-2">Value Categories</p>
             </div>
             <div>
-              <p className="text-3xl font-bold shimmer-text">Daily</p>
-              <p className="text-sm text-slate-400 mt-1">Server Data Updates</p>
+              <p className="text-4xl font-extrabold value-gradient">Daily</p>
+              <p className="text-sm text-[#4A4A68] mt-2">
+                Server Data Updates
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="section-divider" />
-
-      {/* Second CTA */}
-      <section className="py-20 px-4">
+      {/* ── Second CTA ── */}
+      <section className="cta-gradient py-20 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Find Out?
           </h2>
-          <p className="text-slate-400 mb-8 text-lg">
+          <p className="text-white/80 mb-8 text-lg">
             It takes less than 60 seconds and costs nothing.
           </p>
           <Link
             href="/evaluate"
-            className="btn-primary inline-flex items-center gap-2 px-10 py-4 text-lg"
+            className="inline-flex items-center gap-2 px-10 py-4 text-lg font-bold rounded-full bg-white text-[#FF6B00] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all"
           >
             Start My Valuation →
           </Link>

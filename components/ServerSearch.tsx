@@ -79,41 +79,34 @@ export default function ServerSearch({ selectedServerId, onSelect }: ServerSearc
       />
 
       {isOpen && filtered.length > 0 && (
-        <div
-          className="absolute z-50 w-full mt-1 rounded-xl shadow-2xl max-h-60 overflow-y-auto"
-          style={{ background: '#0f1d32', border: '1px solid rgba(255, 107, 0, 0.15)' }}
-        >
+        <div className="absolute z-50 w-full mt-1 rounded-xl shadow-lg max-h-60 overflow-y-auto bg-white border border-gray-200">
           {filtered.map((server) => (
             <button
               key={server.id}
               type="button"
               onClick={() => handleSelect(server)}
-              className="w-full px-4 py-2.5 text-left text-sm text-slate-300 hover:text-orange-400 transition-colors"
-              style={{ borderBottom: '1px solid rgba(255, 107, 0, 0.05)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 107, 0, 0.05)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+              className="w-full px-4 py-2.5 text-left text-sm text-[#4A4A68] hover:text-[#FF6B00] hover:bg-[#FFF7ED] transition-colors border-b border-gray-50"
             >
               Server #{server.id}{' '}
-              <span className="text-slate-500">— {server.createdAt}</span>
+              <span className="text-[#9CA3AF]">— {server.createdAt}</span>
             </button>
           ))}
         </div>
       )}
 
       {selectedInfo && (
-        <div
-          className="mt-3 p-3 rounded-xl text-sm"
-          style={{ background: 'rgba(255, 107, 0, 0.05)', border: '1px solid rgba(255, 107, 0, 0.15)' }}
-        >
-          <span className="text-green-400">✓</span>{' '}
-          <span className="text-white font-medium">
+        <div className="mt-3 p-3 rounded-xl text-sm bg-[#FFF7ED] border border-[#FDBA74]">
+          <span className="text-green-600">✓</span>{' '}
+          <span className="text-[#1A1A2E] font-medium">
             Server #{selectedInfo.id}
           </span>{' '}
-          — Created {formatDate(selectedInfo.createdAt)} — Day{' '}
-          {selectedInfo.day} — Season {selectedInfo.season}{' '}
-          {selectedInfo.regions.length > 0 && (
-            <span>— {formatRegions(selectedInfo.regions)}</span>
-          )}
+          <span className="text-[#4A4A68]">
+            — Created {formatDate(selectedInfo.createdAt)} — Day{' '}
+            {selectedInfo.day} — Season {selectedInfo.season}{' '}
+            {selectedInfo.regions.length > 0 && (
+              <span>— {formatRegions(selectedInfo.regions)}</span>
+            )}
+          </span>
         </div>
       )}
     </div>
