@@ -101,7 +101,7 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                     {cat.label}
                   </span>
                   <span className="text-sm font-bold value-gradient">
-                    ${cat.dollarValue.toFixed(0)}
+                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(cat.dollarValue)}
                   </span>
                 </div>
               </div>

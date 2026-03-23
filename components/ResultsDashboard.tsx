@@ -8,6 +8,15 @@ import { getRecommendations } from '@/lib/valuation';
 import ValueChart from './ValueChart';
 import ValueBreakdown from './ValueBreakdown';
 
+// CHANGE 6: Proper USD formatting with commas
+function fmtUSD(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export default function ResultsDashboard() {
   const router = useRouter();
   const [latest, setLatest] = useState<Evaluation | null>(null);
@@ -48,6 +57,7 @@ export default function ResultsDashboard() {
   const change = previous
     ? result.totalValue - previous.result.totalValue
     : null;
+  // CHANGE 8: Format percentage with 1 decimal max
   const changePct = previous
     ? ((change! / previous.result.totalValue) * 100).toFixed(1)
     : null;
@@ -58,7 +68,7 @@ export default function ResultsDashboard() {
   nextEvalDate.setDate(nextEvalDate.getDate() + 14);
 
   function handleShare() {
-    const text = `My Last War Account Value: $${result.totalValue} ($${result.lowRange} - $${result.highRange})\nServer #${serverInfo.id} — Day ${serverInfo.day} — Season ${serverInfo.season}\n\nValued at lastwar-value.vercel.app`;
+    const text = `My Last War Account Value: ${fmtUSD(result.totalValue)} (${fmtUSD(result.lowRange)} - ${fmtUSD(result.highRange)})\nServer #${serverInfo.id} — Day ${serverInfo.day} — Season ${serverInfo.season}\n\nValued at lastwar-value.vercel.app`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -93,10 +103,10 @@ export default function ResultsDashboard() {
           Your Base Value
         </p>
         <p className="text-5xl sm:text-6xl font-bold value-gradient mb-3">
-          ${result.totalValue}
+          {fmtUSD(result.totalValue)}
         </p>
         <p className="text-white/50 mb-3 text-lg">
-          ${result.lowRange} — ${result.highRange}
+          {fmtUSD(result.lowRange)} — {fmtUSD(result.highRange)}
         </p>
         {change !== null && (
           <span
@@ -106,7 +116,7 @@ export default function ResultsDashboard() {
                 : 'bg-[rgba(239,68,68,0.1)] text-[#EF4444] border border-[rgba(239,68,68,0.2)]'
             }`}
           >
-            {change >= 0 ? '+' : ''}${change.toFixed(0)} ({changePct}%){' '}
+            {change >= 0 ? '+' : ''}{fmtUSD(Math.abs(change))} ({changePct}%){' '}
             {change >= 0 ? '↑' : '↓'}
           </span>
         )}
@@ -144,7 +154,7 @@ export default function ResultsDashboard() {
                       : 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]'
                   }`}
                 >
-                  {c.diff > 0 ? '+' : ''}${Math.abs(c.diff).toFixed(0)}
+                  {c.diff > 0 ? '+' : '-'}{fmtUSD(Math.abs(c.diff))}
                 </span>
               </div>
             ))}
@@ -155,7 +165,7 @@ export default function ResultsDashboard() {
                   change! >= 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'
                 }
               >
-                {change! >= 0 ? '+' : ''}${change!.toFixed(0)}
+                {change! >= 0 ? '+' : '-'}{fmtUSD(Math.abs(change!))}
               </span>
             </div>
           </div>
@@ -178,7 +188,7 @@ export default function ResultsDashboard() {
                   {rec.category}
                 </span>
                 <span className="text-xs text-[#22C55E] font-semibold">
-                  +${rec.estimatedBoost} potential
+                  +{fmtUSD(rec.estimatedBoost)} potential
                 </span>
               </div>
               <p className="text-xs text-white/40">{rec.action}</p>

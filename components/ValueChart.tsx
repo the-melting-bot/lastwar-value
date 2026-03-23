@@ -121,7 +121,7 @@ export default function ValueChart({ evaluations }: ValueChartProps) {
           <YAxis
             stroke="rgba(255, 255, 255, 0.1)"
             tick={{ fill: 'rgba(255, 255, 255, 0.5)', fontSize: 12 }}
-            tickFormatter={(v) => `$${v}`}
+            tickFormatter={(v) => `$${Number(v).toLocaleString()}`}
           />
           <Tooltip
             contentStyle={{
@@ -131,7 +131,7 @@ export default function ValueChart({ evaluations }: ValueChartProps) {
               color: '#F8FAFC',
               boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
             }}
-            formatter={(value) => [`$${value}`, 'Value']}
+            formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Value']}
           />
           <Area
             type="monotone"
