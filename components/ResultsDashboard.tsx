@@ -28,10 +28,10 @@ export default function ResultsDashboard() {
   if (!latest) {
     return (
       <div className="text-center py-20">
-        <h2 className="text-2xl font-bold text-[#1A1A2E] mb-4">
+        <h2 className="text-2xl font-bold text-white mb-4">
           No evaluations yet
         </h2>
-        <p className="text-[#4A4A68] mb-6">
+        <p className="text-white/50 mb-6">
           Complete an evaluation to see your results.
         </p>
         <button
@@ -89,28 +89,28 @@ export default function ResultsDashboard() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Section 1: Value Header */}
       <div className="card-static p-8 text-center">
-        <p className="text-[#4A4A68] text-sm mb-3 tracking-wide uppercase font-medium">
+        <p className="text-white/50 text-sm mb-3 tracking-wide uppercase font-medium">
           Your Base Value
         </p>
         <p className="text-5xl sm:text-6xl font-bold value-gradient mb-3">
           ${result.totalValue}
         </p>
-        <p className="text-[#4A4A68] mb-3 text-lg">
+        <p className="text-white/50 mb-3 text-lg">
           ${result.lowRange} — ${result.highRange}
         </p>
         {change !== null && (
           <span
             className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold ${
               change >= 0
-                ? 'bg-green-50 text-green-600 border border-green-200'
-                : 'bg-red-50 text-red-600 border border-red-200'
+                ? 'bg-[rgba(34,197,94,0.1)] text-[#22C55E] border border-[rgba(34,197,94,0.2)]'
+                : 'bg-[rgba(239,68,68,0.1)] text-[#EF4444] border border-[rgba(239,68,68,0.2)]'
             }`}
           >
             {change >= 0 ? '+' : ''}${change.toFixed(0)} ({changePct}%){' '}
             {change >= 0 ? '↑' : '↓'}
           </span>
         )}
-        <p className="text-[#9CA3AF] text-sm mt-3">
+        <p className="text-white/30 text-sm mt-3">
           Server #{serverInfo.id} — Day {serverInfo.day} — Season{' '}
           {serverInfo.season}
         </p>
@@ -125,7 +125,7 @@ export default function ResultsDashboard() {
       {/* Section 4: What Changed */}
       {changedCategories.length > 0 && (
         <div className="card-static p-6">
-          <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">
+          <h3 className="text-lg font-bold text-white mb-4">
             What Changed
           </h3>
           <div className="space-y-2">
@@ -134,25 +134,25 @@ export default function ResultsDashboard() {
                 key={i}
                 className="flex items-center justify-between text-sm py-1"
               >
-                <span className="text-[#4A4A68]">
+                <span className="text-white/60">
                   {c.emoji} {c.name}
                 </span>
                 <span
                   className={`font-medium px-2.5 py-0.5 rounded-full text-xs ${
                     c.diff > 0
-                      ? 'bg-green-50 text-green-600'
-                      : 'bg-red-50 text-red-600'
+                      ? 'bg-[rgba(34,197,94,0.1)] text-[#22C55E]'
+                      : 'bg-[rgba(239,68,68,0.1)] text-[#EF4444]'
                   }`}
                 >
                   {c.diff > 0 ? '+' : ''}${Math.abs(c.diff).toFixed(0)}
                 </span>
               </div>
             ))}
-            <div className="pt-2 mt-2 flex justify-between font-bold text-sm border-t border-gray-100">
-              <span className="text-[#1A1A2E]">Net Change</span>
+            <div className="pt-2 mt-2 flex justify-between font-bold text-sm border-t border-white/8">
+              <span className="text-white">Net Change</span>
               <span
                 className={
-                  change! >= 0 ? 'text-green-600' : 'text-red-600'
+                  change! >= 0 ? 'text-[#22C55E]' : 'text-[#EF4444]'
                 }
               >
                 {change! >= 0 ? '+' : ''}${change!.toFixed(0)}
@@ -164,24 +164,24 @@ export default function ResultsDashboard() {
 
       {/* Section 5: Recommendations */}
       <div className="card-static p-6">
-        <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">
+        <h3 className="text-lg font-bold text-white mb-4">
           💡 Invest Next
         </h3>
         <div className="space-y-3">
           {recommendations.map((rec, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl bg-[#FFF7ED] border border-[#FDBA74]/40"
+              className="p-4 rounded-xl bg-[rgba(245,158,11,0.05)] border border-[rgba(245,158,11,0.12)]"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-[#1A1A2E]">
+                <span className="text-sm font-medium text-white">
                   {rec.category}
                 </span>
-                <span className="text-xs text-green-600 font-semibold">
+                <span className="text-xs text-[#22C55E] font-semibold">
                   +${rec.estimatedBoost} potential
                 </span>
               </div>
-              <p className="text-xs text-[#4A4A68]">{rec.action}</p>
+              <p className="text-xs text-white/40">{rec.action}</p>
             </div>
           ))}
         </div>
@@ -202,7 +202,7 @@ export default function ResultsDashboard() {
           {copied ? '✅ Copied!' : '📤 Share Results'}
         </button>
       </div>
-      <p className="text-center text-[#9CA3AF] text-sm">
+      <p className="text-center text-white/30 text-sm">
         Next suggested eval:{' '}
         {nextEvalDate.toLocaleDateString('en-US', {
           month: 'short',

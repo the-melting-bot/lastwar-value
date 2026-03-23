@@ -8,20 +8,20 @@ interface ValueBreakdownProps {
   input?: EvaluationInput;
 }
 
-function getLabelStyle(label: string): { text: string; bg: string; border: string } {
+function getLabelStyle(label: string): { text: string; bg: string } {
   switch (label) {
     case 'LOW':
-      return { text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' };
+      return { text: 'text-[#EF4444]', bg: 'bg-[rgba(239,68,68,0.1)]' };
     case 'AVERAGE':
-      return { text: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200' };
+      return { text: 'text-[#EAB308]', bg: 'bg-[rgba(234,179,8,0.1)]' };
     case 'ABOVE AVG':
-      return { text: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' };
+      return { text: 'text-[#22C55E]', bg: 'bg-[rgba(34,197,94,0.1)]' };
     case 'HIGH':
-      return { text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' };
+      return { text: 'text-[#10B981]', bg: 'bg-[rgba(16,185,129,0.1)]' };
     case 'EXCEPTIONAL':
-      return { text: 'text-[#FF6B00]', bg: 'bg-orange-50', border: 'border-orange-200' };
+      return { text: 'text-[#FFD700]', bg: 'bg-[rgba(255,215,0,0.1)]' };
     default:
-      return { text: 'text-gray-500', bg: 'bg-gray-50', border: 'border-gray-200' };
+      return { text: 'text-white/40', bg: 'bg-white/5' };
   }
 }
 
@@ -36,9 +36,9 @@ function getBarGradient(label: string): string {
     case 'HIGH':
       return 'linear-gradient(90deg, #10b981, #34d399)';
     case 'EXCEPTIONAL':
-      return 'linear-gradient(90deg, #FF6B00, #FFB800)';
+      return 'linear-gradient(90deg, #F59E0B, #FFD700)';
     default:
-      return 'linear-gradient(90deg, #9ca3af, #d1d5db)';
+      return 'linear-gradient(90deg, #475569, #64748b)';
   }
 }
 
@@ -60,21 +60,18 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
 
   return (
     <div className="card-static p-6">
-      <h3 className="text-lg font-bold text-[#1A1A2E] mb-4">Value Breakdown</h3>
+      <h3 className="text-lg font-bold text-white mb-4">Value Breakdown</h3>
       <div className="space-y-3">
-        {active.map((cat, idx) => {
+        {active.map((cat) => {
           const isExpanded = expandedKey === cat.key;
           const hasExpandableDetail =
             cat.key === 'mainSquadPower' && squadHeroEntries.length > 0;
           const labelStyle = getLabelStyle(cat.label);
-          const isEven = idx % 2 === 0;
 
           return (
             <div
               key={cat.key}
-              className={`p-3.5 rounded-xl border border-gray-100 ${
-                isEven ? 'bg-white' : 'bg-[#FAFAFA]'
-              }`}
+              className="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06]"
             >
               <div
                 className={`flex items-center justify-between mb-1.5 ${
@@ -88,18 +85,18 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
               >
                 <div className="flex items-center gap-2">
                   <span>{cat.emoji}</span>
-                  <span className="text-sm font-medium text-[#1A1A2E]">
+                  <span className="text-sm font-medium text-white">
                     {cat.name}
                   </span>
                   {hasExpandableDetail && (
-                    <span className="text-xs text-[#9CA3AF]">
+                    <span className="text-xs text-white/30">
                       {isExpanded ? '▾' : '▸'}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
                   <span
-                    className={`text-xs font-bold px-2 py-0.5 rounded-full border ${labelStyle.text} ${labelStyle.bg} ${labelStyle.border}`}
+                    className={`text-xs font-bold px-2 py-0.5 rounded-full ${labelStyle.text} ${labelStyle.bg}`}
                   >
                     {cat.label}
                   </span>
@@ -109,15 +106,15 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                 </div>
               </div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs text-[#4A4A68]">
+                <span className="text-xs text-white/50">
                   You: {formatValue(cat.playerValue)}
                 </span>
-                <span className="text-xs text-[#D1D5DB]">|</span>
-                <span className="text-xs text-[#9CA3AF]">
+                <span className="text-xs text-white/15">|</span>
+                <span className="text-xs text-white/30">
                   Avg: {formatValue(cat.baseline)}
                 </span>
               </div>
-              <div className="w-full rounded-full h-1.5 bg-[#F3F4F6]">
+              <div className="w-full rounded-full h-1.5" style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
                 <div
                   className="h-1.5 rounded-full transition-all"
                   style={{
@@ -129,9 +126,9 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
 
               {/* Expandable hero detail for Main Squad */}
               {isExpanded && cat.key === 'mainSquadPower' && (
-                <div className="mt-3 pt-3 space-y-1 border-t border-gray-100">
+                <div className="mt-3 pt-3 space-y-1 border-t border-white/8">
                   {input?.squadType && (
-                    <p className="text-xs text-[#FF6B00] font-medium mb-1">
+                    <p className="text-xs text-[#FFD700] font-medium mb-1">
                       {input.squadType} Squad
                     </p>
                   )}
@@ -140,8 +137,8 @@ export default function ValueBreakdown({ categories, input }: ValueBreakdownProp
                       key={name}
                       className="flex items-center justify-between text-xs"
                     >
-                      <span className="text-[#4A4A68]">{name}</span>
-                      <span className="text-[#1A1A2E] font-medium">
+                      <span className="text-white/50">{name}</span>
+                      <span className="text-white/80 font-medium">
                         {power.toLocaleString('en-US')}
                       </span>
                     </div>

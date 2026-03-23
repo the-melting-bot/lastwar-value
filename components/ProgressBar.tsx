@@ -19,24 +19,24 @@ export default function ProgressBar({
             <div
               className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                 i < currentStep
-                  ? 'text-white'
+                  ? 'text-[#0B1426]'
                   : i === currentStep
-                  ? 'text-white ring-2 ring-offset-2 ring-[#FF6B00] ring-offset-white'
-                  : 'text-[#9CA3AF]'
+                  ? 'text-[#0B1426] ring-2 ring-offset-2 ring-[#FFD700] ring-offset-[#0B1426]'
+                  : 'text-white/30'
               }`}
               style={
                 i < currentStep
-                  ? { background: 'linear-gradient(135deg, #FF6B00, #FFB800)' }
+                  ? { background: 'linear-gradient(135deg, #F59E0B, #FFD700)' }
                   : i === currentStep
-                  ? { background: 'linear-gradient(135deg, #FF6B00, #FF8A33)' }
-                  : { background: '#F3F4F6', border: '1.5px solid #D1D5DB' }
+                  ? { background: 'linear-gradient(135deg, #F59E0B, #FFD700)' }
+                  : { background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.1)' }
               }
             >
               {i < currentStep ? '✓' : i + 1}
             </div>
             <span
               className={`text-xs mt-1.5 hidden sm:block font-medium ${
-                i <= currentStep ? 'text-[#FF6B00]' : 'text-[#9CA3AF]'
+                i <= currentStep ? 'text-[#FFD700]' : 'text-white/30'
               }`}
             >
               {label}
@@ -44,7 +44,7 @@ export default function ProgressBar({
           </div>
         ))}
       </div>
-      <div className="w-full rounded-full h-2 mt-2 bg-[#F3F4F6]">
+      <div className="w-full rounded-full h-2 mt-2" style={{ background: 'rgba(255, 255, 255, 0.06)' }}>
         <div
           className="progress-fill"
           style={{ width: `${(currentStep / (totalSteps - 1)) * 100}%` }}
