@@ -8,35 +8,39 @@ interface Anchor {
 }
 
 const DECORATION_POWER_ANCHORS: Anchor[] = [
-  { day: 100, value: 20000 },
-  { day: 300, value: 100000 },
-  { day: 500, value: 300000 },
-  { day: 700, value: 600000 },
-  { day: 900, value: 1000000 },
+  { day: 100, value: 25000 },
+  { day: 200, value: 80000 },
+  { day: 300, value: 150000 },
+  { day: 500, value: 400000 },
+  { day: 700, value: 750000 },
+  { day: 900, value: 1200000 },
 ];
 
 const TOTAL_HERO_POWER_ANCHORS: Anchor[] = [
-  { day: 100, value: 1000000 },
-  { day: 300, value: 4000000 },
-  { day: 500, value: 8000000 },
-  { day: 700, value: 15000000 },
-  { day: 900, value: 25000000 },
+  { day: 100, value: 1500000 },
+  { day: 200, value: 5000000 },
+  { day: 300, value: 10000000 },
+  { day: 500, value: 20000000 },
+  { day: 700, value: 35000000 },
+  { day: 900, value: 50000000 },
 ];
 
 const MAIN_SQUAD_POWER_ANCHORS: Anchor[] = [
-  { day: 100, value: 2000000 },
-  { day: 300, value: 15000000 },
-  { day: 500, value: 35000000 },
-  { day: 700, value: 55000000 },
+  { day: 100, value: 3000000 },
+  { day: 200, value: 12000000 },
+  { day: 300, value: 22000000 },
+  { day: 500, value: 40000000 },
+  { day: 700, value: 60000000 },
   { day: 900, value: 80000000 },
 ];
 
 const DRONE_LEVEL_ANCHORS: Anchor[] = [
-  { day: 100, value: 5 },
+  { day: 100, value: 3 },
+  { day: 200, value: 8 },
   { day: 300, value: 15 },
-  { day: 500, value: 25 },
-  { day: 700, value: 35 },
-  { day: 900, value: 40 },
+  { day: 500, value: 28 },
+  { day: 700, value: 38 },
+  { day: 900, value: 45 },
 ];
 
 const DRONE_COMPONENT_POWER_ANCHORS: Anchor[] = [
@@ -165,29 +169,27 @@ function scoreDroneComponents(input: EvaluationInput, day: number): number {
   return (levelScore + powerScore) / 2;
 }
 
-// CHANGE 4: Fixed exclusive weapons scoring — much more granular
+// CHANGE 3: Overhauled exclusive weapons scoring — milestone bonuses at 10/20/30
 function scoreExclusiveWeapons(
   weapons: { unlocked: boolean; level: number }[]
 ): number {
   const unlocked = weapons.filter((w) => w.unlocked);
   if (unlocked.length === 0) return 0.05;
-  const avgLevel =
-    unlocked.reduce((sum, w) => sum + w.level, 0) / unlocked.length;
 
-  // Base score from unlock count (0.2 to 1.0)
-  const countScore = unlocked.length / 5;
+  // Score each weapon individually based on milestone breakpoints
+  const weaponScores = unlocked.map((w) => {
+    if (w.level >= 30) return 3.0;       // Endgame — costs serious money/time
+    if (w.level >= 20) return 1.8 + ((w.level - 20) / 10) * 0.8; // 1.8 → 2.6
+    if (w.level >= 10) return 0.9 + ((w.level - 10) / 10) * 0.7; // 0.9 → 1.6
+    return 0.1 + ((w.level - 1) / 9) * 0.7;                       // 0.1 → 0.8
+  });
 
-  // Level multiplier with diminishing returns after 20
-  let levelMultiplier: number;
-  if (avgLevel <= 10) {
-    levelMultiplier = (avgLevel / 10) * 0.8;
-  } else if (avgLevel <= 20) {
-    levelMultiplier = 0.8 + ((avgLevel - 10) / 10) * 1.0;
-  } else {
-    levelMultiplier = 1.8 + ((avgLevel - 20) / 10) * 1.2;
-  }
+  const avgWeaponScore = weaponScores.reduce((sum, s) => sum + s, 0) / weaponScores.length;
 
-  return countScore * levelMultiplier;
+  // Unlock multiplier: even 1 weapon at Lv30 is very valuable
+  const unlockMultiplier = 0.5 + (unlocked.length / 5) * 0.5; // 0.6 to 1.0
+
+  return avgWeaponScore * unlockMultiplier;
 }
 
 // Main squad scoring with balance bonus
@@ -223,16 +225,24 @@ function scoreMainSquad(
   };
 }
 
-function scoreHqLevel(level: number, season: number): number {
+// CHANGE 1: HQ scoring now uses server day context
+function scoreHqLevel(level: number, season: number, day: number): number {
   if (season < 2) return 0;
+
   if (level >= 35) return 2.5;
   if (level >= 34) return 2.0;
-  if (level >= 32) return 1.7;
-  if (level >= 30) return 1.5;
-  if (level >= 25) return 1.2;
-  if (level >= 20) return 1.0;
-  if (level >= 15) return 0.7;
-  return 0.4;
+  if (level >= 33) return 1.7;
+  if (level >= 32) return 1.4;
+  if (level >= 31) return 1.2;
+  if (level >= 30) {
+    // HQ 30 is "average" after Day 250 — score depends on server age
+    if (day <= 200) return 1.5;
+    if (day <= 350) return 1.0;
+    return 0.8;
+  }
+  if (level >= 25) return 0.5;
+  if (level >= 20) return 0.3;
+  return 0.15;
 }
 
 function scoreOilTechTree(tree: string, season: number): number {
@@ -429,16 +439,21 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
     baseline: `Level 6 — ${Math.round(compBaseline).toLocaleString('en-US')} power`,
   };
 
-  // CHANGE 4: Updated weapon scoring
+  // CHANGE 3: Updated weapon scoring with milestone bonuses
   const weaponScore = scoreExclusiveWeapons(input.exclusiveWeapons);
   const unlockedWeapons = input.exclusiveWeapons.filter((w) => w.unlocked);
-  const avgWeaponLevel = unlockedWeapons.length > 0
-    ? Math.round(unlockedWeapons.reduce((sum, w) => sum + w.level, 0) / unlockedWeapons.length)
-    : 0;
+  // Build detailed weapon level string showing individual levels
+  let weaponDetail: string;
+  if (unlockedWeapons.length === 0) {
+    weaponDetail = '0/5 Unlocked';
+  } else {
+    const levelList = unlockedWeapons.map((w) => `Lv${w.level}`).join(', ');
+    weaponDetail = `${unlockedWeapons.length}/5 — ${levelList}`;
+  }
   scores.exclusiveWeapons = {
     score: weaponScore,
-    playerValue: `${unlockedWeapons.length}/5 Unlocked — Avg Level: ${avgWeaponLevel}`,
-    baseline: '3/5 Unlocked — Avg Level: 15',
+    playerValue: weaponDetail,
+    baseline: '3/5 Unlocked — Avg Lv15',
   };
 
   scores.overlordLevel = {
@@ -447,10 +462,11 @@ export function calculateValuation(input: EvaluationInput): ValuationResult {
     baseline: season >= 2 ? 'Level 5' : 'N/A',
   };
 
+  // CHANGE 1: HQ baseline depends on server age
   scores.hqLevel = {
-    score: scoreHqLevel(input.hqLevel, season),
+    score: scoreHqLevel(input.hqLevel, season, day),
     playerValue: season >= 2 ? input.hqLevel : 'N/A',
-    baseline: season >= 2 ? '20' : 'N/A',
+    baseline: season >= 2 ? (day >= 250 ? '30' : day >= 150 ? '25' : '20') : 'N/A',
   };
 
   scores.oilTechTree = {

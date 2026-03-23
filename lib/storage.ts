@@ -33,3 +33,18 @@ export function deleteEvaluation(id: string): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(evaluations));
   }
 }
+
+export function clearAllData(): void {
+  if (typeof window === 'undefined') return;
+  // Clear all app-related localStorage keys
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.includes('lastwar') || key.includes('evaluation') || key.includes('form'))) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach((key) => localStorage.removeItem(key));
+  // Also explicitly remove the main storage key
+  localStorage.removeItem(STORAGE_KEY);
+}
